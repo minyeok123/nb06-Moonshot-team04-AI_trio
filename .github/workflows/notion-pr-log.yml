@@ -1,0 +1,62 @@
+name: Notion PR Log
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+
+jobs:
+  log-pr-to-notion:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send PR info to Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          MERGED_AT="${{ github.event.pull_request.merged_at }}"
+          COMMITS_URL="${{ github.event.pull_request.commits_url }}"
+
+          # ✅ PR의 가장 최신 커밋 메시지 가져오기 (마지막 커밋)
+          COMMIT_MESSAGE=$(curl -s \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "$COMMITS_URL" \
+            | jq -r '.[-1].commit.message')
+
+          curl -X POST https://api.notion.com/v1/pages \
+            -H "Authorization: Bearer $NOTION_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "Notion-Version: 2022-06-28" \
+            --data "{
+              \"parent\": { \"database_id\": \"$DATABASE_ID\" },
+              \"properties\": {
+                \"Name\": {
+                  \"title\": [
+                    { \"text\": { \"content\": \"$PR_TITLE\" } }
+                  ]
+                },
+                \"Author\": {
+                  \"rich_text\": [
+                    { \"text\": { \"content\": \"$PR_AUTHOR\" } }
+                  ]
+                },
+                \"CommitMessage\": {
+                  \"rich_text\": [
+                    { \"text\": { \"content\": \"$COMMIT_MESSAGE\" } }
+                  ]
+                },
+                \"MergedAt\": {
+                  \"date\": { \"start\": \"$MERGED_AT\" }
+                },
+                \"PRUrl\": {
+                  \"url\": \"$PR_URL\"
+                }
+              }
+            }"
