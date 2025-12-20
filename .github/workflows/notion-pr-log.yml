@@ -37,7 +37,7 @@ jobs:
             --data "{
               \"parent\": { \"database_id\": \"$DATABASE_ID\" },
               \"properties\": {
-                \"Name\": {
+                \"Title\": {
                   \"title\": [
                     { \"text\": { \"content\": \"$PR_TITLE\" } }
                   ]
