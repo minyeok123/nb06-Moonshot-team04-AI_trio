@@ -4,16 +4,16 @@
 
 ## **팀원 구성**
 
-오윤 ([개인 Github 링크](https://github.com/xoxo-oy))
-김민혁 ([개인 Github 링크](https://github.com/minyeok123))
-김지선 ([개인 Github 링크](https://github.com/KimDay366))
+- 오윤 ([개인 Github 링크](https://github.com/xoxo-oy))
+- 김민혁 ([개인 Github 링크](https://github.com/minyeok123))
+- 김지선 ([개인 Github 링크](https://github.com/KimDay366))
 
 ---
 
 ## **프로젝트 소개**
 
 - Moonshot - 프로젝트 일정 관리 서비스 백엔드 구축
-- 프로젝트 기간: 2025.12.22 ~ 2026.01.15
+- 프로젝트 기간: 2025.12.22 - 2026.01.15
 
 ---
 
