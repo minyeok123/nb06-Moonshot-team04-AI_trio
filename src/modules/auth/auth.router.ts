@@ -5,5 +5,6 @@ import asyncHandler from '../../libs/asyncHandler';
 const router = express.Router();
 
 router.post('/login', asyncHandler(AuthController.login));
+router.post('/refresh', asyncHandler(AuthController.refresh));
 
 export default router;

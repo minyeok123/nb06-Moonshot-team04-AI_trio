@@ -1,4 +1,3 @@
-import { NextFunction, Request, Response } from 'express';
 import { AuthRepo } from './auth.repo';
 
 import bcrypt from 'bcrypt';

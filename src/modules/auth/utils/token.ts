@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../../libs/constants';
 
 class Token {
@@ -12,6 +12,20 @@ class Token {
     const refreshToken = jwt.sign(payload, JWT_SECRET!, refreshExpiresIn);
 
     return { accessToken, refreshToken };
+  };
+
+  refresh = async (
+    refreshToken: string,
+  ): Promise<{ accessToken: string; newRefreshToken: string }> => {
+    let payload;
+
+    payload = jwt.verify(refreshToken, JWT_SECRET!) as JwtPayload;
+
+    const { id } = payload;
+    const tokens = this.createTokens(id);
+    const { accessToken, refreshToken: newRefreshToken } = tokens;
+
+    return { accessToken, newRefreshToken };
   };
 }
 
