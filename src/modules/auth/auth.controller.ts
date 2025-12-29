@@ -5,6 +5,7 @@ import token from '../auth/utils/token';
 import { TokenExpiredError } from '../../libs/error';
 
 export class AuthController {
+<<<<<<< HEAD
   static login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
@@ -23,6 +24,12 @@ export class AuthController {
     const tokens = await token.refresh(refreshToken);
     const { accessToken, newRefreshToken } = tokens;
     res.status(200).json({ accessToken, refreshToken: newRefreshToken });
+=======
+  static register = async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body;
+    const userWithoutPassword = await authService.register(data);
+    res.status(201).send(userWithoutPassword);
+>>>>>>> ef3c03d (✨ feat:회원 등록 기능 구현)
   };
 }
 
