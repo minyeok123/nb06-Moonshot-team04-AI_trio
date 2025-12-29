@@ -24,7 +24,7 @@ export class AuthService {
       data: {
         email: data.email,
         password: hashedPassword,
-        name: data.email,
+        name: data.name,
         profileImgUrl: data.profileImgUrl,
       },
     };
