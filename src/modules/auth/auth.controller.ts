@@ -24,6 +24,11 @@ export class AuthController {
     const { accessToken, newRefreshToken } = tokens;
     res.status(200).json({ accessToken, refreshToken: newRefreshToken });
   };
+  static register = async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body;
+    const userWithoutPassword = await authService.register(data);
+    res.status(201).send(userWithoutPassword);
+  };
 }
 
 const authRepo = new AuthRepo();
