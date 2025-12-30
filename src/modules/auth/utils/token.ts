@@ -4,6 +4,10 @@ import { prisma } from '../../../libs/prisma';
 import { TokenExpiredError } from '../../../libs/error';
 import bcrypt from 'bcrypt';
 
+interface tokenPayloadUserid {
+  id: number;
+}
+
 class Token {
   createTokens = (userId: number) => {
     const payload = { id: userId };
@@ -12,9 +16,16 @@ class Token {
     // access,refresh 유지 시간 정리 필요
 
     const accessToken = jwt.sign(payload, JWT_SECRET!, accessExpiresIn);
+
     const refreshToken = jwt.sign(payload, JWT_SECRET!, refreshExpiresIn);
 
     return { accessToken, refreshToken };
+  };
+
+  verifyAccessToken = (token: string) => {
+    const decodedUser = jwt.verify(token, JWT_SECRET!) as tokenPayloadUserid;
+
+    return { userId: decodedUser.id };
   };
 
   refresh = async (
