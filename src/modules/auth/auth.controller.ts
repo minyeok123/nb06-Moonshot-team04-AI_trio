@@ -8,7 +8,7 @@ export class AuthController {
   static login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    const { accessToken, refreshToken } = await AuthService.login(email, password);
+    const { accessToken, refreshToken } = await authService.login(email, password);
 
     res.status(200).json({ message: 'login Ok!', accessToken, refreshToken });
   };

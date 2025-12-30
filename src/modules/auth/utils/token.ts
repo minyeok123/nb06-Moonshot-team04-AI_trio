@@ -1,5 +1,8 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../../libs/constants';
+import { prisma } from '../../../libs/prisma';
+import { TokenExpiredError } from '../../../libs/error';
+import bcrypt from 'bcrypt';
 
 class Token {
   createTokens = (userId: number) => {
@@ -20,12 +23,38 @@ class Token {
     let payload;
 
     payload = jwt.verify(refreshToken, JWT_SECRET!) as JwtPayload;
-
+    if (!payload) throw new TokenExpiredError();
     const { id } = payload;
+
+    const refreshInfo = await prisma.refreshToken.findFirst({ where: { userId: Number(id) } });
+    if (!refreshInfo) throw new TokenExpiredError();
+    const isValid = await bcrypt.compare(refreshToken, refreshInfo.token);
+    if (!isValid) throw new TokenExpiredError();
+
     const tokens = this.createTokens(id);
     const { accessToken, refreshToken: newRefreshToken } = tokens;
 
+    const { exp } = jwt.verify(newRefreshToken, JWT_SECRET!) as JwtPayload;
+    const expiresAt = new Date(exp! * 1000);
+
+    const nowDate = new Date();
+    if (refreshInfo.expiresAt < nowDate) throw new TokenExpiredError();
+    const hashNewRedfreshToken = await this.hashRefreshToken(newRefreshToken);
+
+    await prisma.refreshToken.update({
+      where: { id: refreshInfo.id },
+      data: {
+        token: hashNewRedfreshToken,
+        expiresAt: expiresAt,
+      },
+    });
     return { accessToken, newRefreshToken };
+  };
+
+  hashRefreshToken = async (refreshToken: string) => {
+    const saltRounds = 10;
+    const hashed = await bcrypt.hash(refreshToken, saltRounds);
+    return hashed;
   };
 }
 

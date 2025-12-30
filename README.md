@@ -84,8 +84,6 @@
 │   │       ├── sample.validator.ts
 │   │       └── utils
 │   │           └── sample.ts
-│   ├── prisma
-│   │   └── common.ts
 │   └── types
 │       └── express
 │           └── common.ts

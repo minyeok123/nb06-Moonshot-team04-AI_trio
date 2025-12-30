@@ -27,6 +27,7 @@ model User {
   tasks          Task[]
   comments       Comment[]
   oauths         Oauth[]
+  refreshToken   RefreshToken?
 
   @@map("users")
 }
@@ -168,6 +169,15 @@ model Oauth {
 
   @@unique([provider, providerId])
   @@map("oauths")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 enum Provider {
