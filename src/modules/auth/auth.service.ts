@@ -42,6 +42,7 @@ export class AuthService {
   };
   login = async (email: string, password: string) => {
     const getUser = await this.repo.findUserByEmail(email);
+
     if (!getUser) throw new Error('사용자 아이디를 찾을 수 없습니다');
 
     const userPassword = getUser.password as string;
