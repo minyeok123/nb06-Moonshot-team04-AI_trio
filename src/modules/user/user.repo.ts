@@ -1,7 +1,14 @@
 import { prisma } from '../../libs/prisma';
 
 export class UserRepo {
-  async findUserById(userId: number) {
-    return await prisma.user.findUnique({ where: { id: userId! } });
-  }
+  findUserById = async (userId: number) => {
+    return await prisma.user.findUniqueOrThrow({ where: { id: userId! } });
+  };
+
+  updateUserInfo = async (userId: number, password: string) => {
+    return await await prisma.user.update({
+      where: { id: userId },
+      data: { password },
+    });
+  };
 }
