@@ -36,7 +36,51 @@ export class MemberRepo {
   };
 
   findProjectMember = async (projectId: number, userId: number) => {
-    const member = await prisma.projectMember.findFirst({ where: { projectId, userId } });
+    const member = await prisma.projectMember.findFirst({
+      where: { projectId, userId },
+      include: { projects: true },
+    });
     return member;
+  };
+
+  findProjectIdByInvitationId = async (invitationId: number) => {
+    const invitation = await prisma.invitation.findUnique({
+      where: { id: invitationId },
+      select: { projectId: true },
+    });
+    return invitation?.projectId;
+  };
+
+  removeMember = async (projectId: number, userId: number) => {
+    return prisma.projectMember.update({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId,
+        },
+      },
+      data: {
+        memberStatus: 'rejected',
+      },
+    });
+  };
+
+  findUserByEmail = async (email: string) => {
+    return prisma.user.findUnique({ where: { email } });
+  };
+
+  findInvitation = async (projectId: number, receiveUserId: number) => {
+    return prisma.invitation.findFirst({ where: { projectId, receiveUserId } });
+  };
+
+  createInvitation = async (sendUserId: number, receiveUserId: number, projectId: number) => {
+    return prisma.invitation.create({
+      data: {
+        sendUserId,
+        receiveUserId,
+        projectId,
+        invitationStatus: 'pending',
+      },
+    });
   };
 }
