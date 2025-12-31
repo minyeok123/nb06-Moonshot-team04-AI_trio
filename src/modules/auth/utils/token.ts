@@ -50,12 +50,12 @@ class Token {
 
     const nowDate = new Date();
     if (refreshInfo.expiresAt < nowDate) throw new CustomError(401, '토큰 만료');
-    const hashNewRedfreshToken = await this.hashRefreshToken(newRefreshToken);
+    const hashNewRefreshToken = await this.hashRefreshToken(newRefreshToken);
 
     await prisma.refreshToken.update({
       where: { id: refreshInfo.id },
       data: {
-        token: hashNewRedfreshToken,
+        token: hashNewRefreshToken,
         expiresAt: expiresAt,
       },
     });
