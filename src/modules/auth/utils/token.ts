@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../../libs/constants';
 import { prisma } from '../../../libs/prisma';
-import { TokenExpiredError } from '../../../libs/error';
+import { CustomError } from '../../../libs/error';
 import bcrypt from 'bcrypt';
 
 interface tokenPayloadUserid {
@@ -34,13 +34,13 @@ class Token {
     let payload;
 
     payload = jwt.verify(refreshToken, JWT_SECRET!) as JwtPayload;
-    if (!payload) throw new TokenExpiredError();
+    if (!payload) throw new CustomError(401, '토큰 만료');
     const { id } = payload;
 
     const refreshInfo = await prisma.refreshToken.findFirst({ where: { userId: Number(id) } });
-    if (!refreshInfo) throw new TokenExpiredError();
+    if (!refreshInfo) throw new CustomError(401, '토큰 만료');
     const isValid = await bcrypt.compare(refreshToken, refreshInfo.token);
-    if (!isValid) throw new TokenExpiredError();
+    if (!isValid) throw new CustomError(401, '토큰 만료');
 
     const tokens = this.createTokens(id);
     const { accessToken, refreshToken: newRefreshToken } = tokens;
@@ -49,7 +49,7 @@ class Token {
     const expiresAt = new Date(exp! * 1000);
 
     const nowDate = new Date();
-    if (refreshInfo.expiresAt < nowDate) throw new TokenExpiredError();
+    if (refreshInfo.expiresAt < nowDate) throw new CustomError(401, '토큰 만료');
     const hashNewRedfreshToken = await this.hashRefreshToken(newRefreshToken);
 
     await prisma.refreshToken.update({

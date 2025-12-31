@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { BaseError, TokenExpiredError } from '../libs/error';
+import { CustomError } from '../libs/error';
 import token from '../modules/auth/utils/token';
 import { UserRepo } from '../modules/user/user.repo';
 
@@ -9,7 +9,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    throw new TokenExpiredError();
+    throw new CustomError(401, '토큰 만료');
   }
   const isAccessToken = authHeader.split(' ')[1];
 
@@ -18,7 +18,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
 
     const user = await userRepo.findUserById(userId);
 
-    if (!user) throw new BaseError('사용자 확인이 불가능합니다', 404);
+    if (!user) throw new CustomError(404, '사용자 확인이 불가능합니다');
 
     const { password: _, ...userInfo } = user;
 
@@ -26,7 +26,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
 
     next();
   } catch (err) {
-    throw new BaseError('사용자 확인이 불가능합니다', 404);
+    throw new CustomError(404, '사용자 확인이 불가능합니다');
   }
 };
 
