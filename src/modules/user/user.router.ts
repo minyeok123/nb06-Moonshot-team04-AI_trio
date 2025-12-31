@@ -6,5 +6,6 @@ import authenticate from '../../middlewares/authenticate';
 const router = express.Router();
 
 router.get('/me', authenticate, asyncHandler(UserController.userInfo));
+router.post('/me', authenticate, asyncHandler(UserController.userInfoChange));
 
 export default router;
