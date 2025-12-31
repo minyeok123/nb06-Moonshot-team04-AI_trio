@@ -1,10 +1,18 @@
 import express from 'express';
 import { UserController } from './user.controller';
-import asyncHandler from '../../libs/asyncHandler';
 import authenticate from '../../middlewares/authenticate';
+import asyncHandler from '../../libs/asyncHandler';
+import { validate } from '../../middlewares/validate';
+import { userPasswordValidator } from './user.validator';
 
 const router = express.Router();
 
 router.get('/me', authenticate, asyncHandler(UserController.userInfo));
+router.post(
+  '/me',
+  authenticate,
+  validate(userPasswordValidator, 'body'),
+  asyncHandler(UserController.userInfoChange),
+);
 
 export default router;

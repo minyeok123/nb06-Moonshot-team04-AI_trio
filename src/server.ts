@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authRouter);
-app.use('/user', userRouter);
+app.use('/users', userRouter);
 app.use('/project', memberRouter);
 
 app.use(defaultNotFoundHandler);

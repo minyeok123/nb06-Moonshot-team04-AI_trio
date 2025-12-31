@@ -14,37 +14,38 @@ datasource db {
 }
 
 model User {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique
-  password       String?
-  name           String
-  profileImgUrl  String?         @map("profile_img_url")
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
-  projects       Project[]
-  projectMembers ProjectMember[]
-  invitations    Invitation[]
-  tasks          Task[]
-  comments       Comment[]
-  oauths         Oauth[]
-  refreshToken   RefreshToken?
+  id               Int             @id @default(autoincrement())
+  email            String          @unique
+  password         String?
+  name             String
+  profileImgUrl    String?         @map("profile_img_url")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  projects         Project[]
+  projectMembers   ProjectMember[]
+  tasks            Task[]
+  comments         Comment[]
+  oauths           Oauth[]
+  refreshToken     RefreshToken?
+  invitations      Invitation[]    @relation("InvitationReceiver")
+  ownerInvitations Invitation[]    @relation("InvitationOwner")
 
   @@map("users")
 }
 
 model Project {
-  id               Int             @id @default(autoincrement())
-  projectName      String          @map("project_name")
-  description      String
-  ownerId          Int             @unique @map("owner_id")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
-  users            User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  projectMembers   ProjectMember[]
-  invitations      Invitation[]    @relation("InvitationProject")
-  ownerInvitations Invitation[]    @relation("InvitationOwner")
-  tasks            Task[]
+  id             Int             @id @default(autoincrement())
+  projectName    String          @map("project_name")
+  description    String
+  ownerId        Int             @map("owner_id")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  users          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  projectMembers ProjectMember[]
+  invitations    Invitation[]
+  tasks          Task[]
 
+  @@unique([id, ownerId])
   @@map("projects")
 }
 
@@ -56,9 +57,9 @@ model Invitation {
   invitationStatus InvitationStatus @default(pending) @map("invitation_status")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
-  users            User             @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
-  project          Project          @relation("InvitationProject", fields: [projectId], references: [id], onDelete: Cascade)
-  owner            Project          @relation("InvitationOwner", fields: [sendUserId], references: [ownerId], onDelete: Cascade)
+  users            User             @relation("InvitationReceiver", fields: [receiveUserId], references: [id], onDelete: Cascade)
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner            User             @relation("InvitationOwner", fields: [sendUserId], references: [id], onDelete: Cascade)
   projectMember    ProjectMember?
 
   @@map("invitations")
