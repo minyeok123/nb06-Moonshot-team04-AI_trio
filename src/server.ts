@@ -9,8 +9,8 @@ import memberRouter from './modules/member/member.router';
 import invitationRouter from './modules/invitation/invitation.router';
 import subtaskRouter from './modules/subtask/subtask.router';
 import subtasksRouter from './modules/subtask/subtasks.router';
-import fileRouter from './modules/file/file.router';
 import commentRouter from './modules/comment/comment.router';
+import fileRouter from './modules/file/file.router';
 
 const app = express();
 
