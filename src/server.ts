@@ -7,7 +7,8 @@ import projectRouter from './modules/project/project.router';
 import { defaultNotFoundHandler, globalErrorHandler } from './middlewares/errorHandler';
 import memberRouter from './modules/member/member.router';
 import invitationRouter from './modules/invitation/invitation.router';
-
+import subtaskRouter from './modules/subtask/subtask.router';
+import subtasksRouter from './modules/subtask/subtasks.router';
 const app = express();
 
 app.use(cors());
@@ -18,6 +19,8 @@ app.use('/users', userRouter);
 app.use('/projects', memberRouter);
 app.use('/projects', projectRouter);
 app.use('/invitations', invitationRouter);
+app.use('/tasks', subtaskRouter);
+app.use('/subtasks', subtasksRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
