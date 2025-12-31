@@ -1,9 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
+import { MemberRepo } from '../modules/member/member.repo';
+import { CustomError } from '../libs/error';
 
 export class Authorize {
   static projectOwner = async (req: Request, res: Response, next: NextFunction) => {
-    // TODO: projectId로 프로젝트 조회 후 owner 확인
-    next();
+    try {
+      const { projectId, invitationId } = req.params;
+      if (!projectId && !invitationId) throw new CustomError(404, '잘못된 요청입니다');
+      const operatorId = req.user.id;
+      let pid: number | undefined;
+      if (projectId) pid = Number(projectId);
+      if (invitationId) {
+        const iid = await memberRepo.findProjectIdByInvitationId(Number(invitationId));
+        pid = iid;
+      }
+      if (!pid) throw new CustomError(404, '잘못된 요청입니다');
+      const member = await memberRepo.findProjectMember(pid, operatorId);
+      if (!member) throw new CustomError(404, '프로젝트의 멤버가 아닙니다');
+      if (member.role !== 'owner') throw new CustomError(403, '프로젝트 관리자가 아닙니다');
+      next();
+    } catch (e) {
+      next(e);
+    }
   };
 
   static projectMember = async (req: Request, res: Response, next: NextFunction) => {
@@ -21,3 +39,5 @@ export class Authorize {
     next();
   };
 }
+
+const memberRepo = new MemberRepo();

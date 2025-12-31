@@ -6,7 +6,7 @@ export function validate(schema: ZodType, source: 'body' | 'params' | 'query' = 
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse(req[source]);
-      req[source] = parsed; // 🔥 변환된 값으로 교체
+      Object.assign(req[source], parsed);
       next();
     } catch (err) {
       next(err);
@@ -21,6 +21,9 @@ validate(createProject,body)
 export function tokenValidate() {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
+      const tokenSchema = z.object({
+        authorization: z.string().startsWith('Bearer '),
+      });
       const authHeader = req.headers.authorization;
       const parsed = tokenSchema.parse({ authorization: authHeader });
 
@@ -30,7 +33,3 @@ export function tokenValidate() {
     }
   };
 }
-
-export const tokenSchema = z.object({
-  authorization: z.string().startsWith('Bearer '),
-});
