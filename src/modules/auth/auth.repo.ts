@@ -17,16 +17,16 @@ export class AuthRepo {
   login = async (refresh: string, userId: number) => {
     const { exp } = jwt.verify(refresh, JWT_SECRET!) as JwtPayload;
     const expiresAt = new Date(exp! * 1000);
-    const hashdRedfreshToken = await token.hashRefreshToken(refresh);
+    const hashdRefreshToken = await token.hashRefreshToken(refresh);
     await prisma.refreshToken.upsert({
       where: { userId },
       create: {
-        token: hashdRedfreshToken,
+        token: hashdRefreshToken,
         userId,
         expiresAt: expiresAt,
       },
       update: {
-        token: hashdRedfreshToken,
+        token: hashdRefreshToken,
         expiresAt: expiresAt,
       },
     });

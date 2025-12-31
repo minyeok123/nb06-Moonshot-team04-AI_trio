@@ -1,8 +1,8 @@
 import { AuthRepo } from './auth.repo';
 import bcrypt from 'bcrypt';
 import type { User } from '../../types/user';
-import { BadRequestError } from './utils/customError';
 import token from './utils/token';
+import { CustomError } from '../../libs/error';
 
 type RegisterData = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password: string };
 type ResponseUser = Pick<User, 'id' | 'email' | 'name' | 'createdAt' | 'updatedAt'> & {
@@ -16,7 +16,7 @@ export class AuthService {
     const { password } = data;
     const existingUser = await this.repo.findOrUnique({ where: { email: data.email } });
     if (existingUser) {
-      throw new BadRequestError(401, '이미 가입된 이메일 입니다.');
+      throw new CustomError(401, '이미 가입한 이메일 입니다.');
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -43,11 +43,12 @@ export class AuthService {
   login = async (email: string, password: string) => {
     const getUser = await this.repo.findUserByEmail(email);
 
-    if (!getUser) throw new Error('사용자 아이디를 찾을 수 없습니다');
+    if (!getUser) throw new CustomError(400, '잘못된 요청입니다');
 
     const userPassword = getUser.password as string;
     const isPasswordValid = await bcrypt.compare(password, userPassword);
-    if (!isPasswordValid) throw new Error('비밀번호를 확인 해 주세요');
+    if (!isPasswordValid)
+      throw new CustomError(404, '존재하지 않거나 비밀번호가 일치하지 않습니다');
 
     const { accessToken, refreshToken } = token.createTokens(getUser.id);
     await this.repo.login(refreshToken, getUser.id);
