@@ -2,11 +2,19 @@ import { prisma } from '../../libs/prisma';
 import { Prisma } from '@prisma/client';
 
 export class ProjectRepo {
-  create = async <T extends Prisma.ProjectCreateArgs>(
-    args: Prisma.SelectSubset<T, Prisma.ProjectCreateArgs>,
-  ): Promise<Prisma.ProjectGetPayload<T>> => {
-    return prisma.project.create(args);
-  };
+  create(data: Prisma.ProjectCreateArgs) {
+    return prisma.project.create({
+      ...data,
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        _count: {
+          select: { projectMembers: true },
+        },
+      },
+    });
+  }
 
   taskStatusCount = async (options: {
     by: ['status'];

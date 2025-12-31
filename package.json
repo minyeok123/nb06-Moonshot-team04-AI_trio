@@ -12,6 +12,9 @@
     "dev": "nodemon --watch src --exec ts-node src/server.ts",
     "build": "tsc"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "^5.0.0",
     "axios": "^1.13.2",
