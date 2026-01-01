@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/file', fileRouter);
+app.use('/files', fileRouter);
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/projects', memberRouter);

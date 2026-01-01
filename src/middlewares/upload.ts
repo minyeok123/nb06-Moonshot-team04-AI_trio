@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// 허용할 파일 타입 : 이미지, 문서, 엑셀, 파워포인트 
+// 허용할 파일 타입 : 이미지, 문서, 엑셀, 파워포인트
 // 프론트엔드에서 사용 할 파일 타입에 대해 1차 필터링 진행
 const allowedMimeTypes = [
   // 이미지
