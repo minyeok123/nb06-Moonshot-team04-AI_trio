@@ -2,7 +2,7 @@ import { prisma } from '../../libs/prisma';
 import { Prisma } from '@prisma/client';
 
 export class ProjectRepo {
-  create(data: Prisma.ProjectCreateArgs) {
+  create = async (data: Prisma.ProjectCreateArgs) => {
     return prisma.project.create({
       ...data,
       select: {
@@ -14,7 +14,7 @@ export class ProjectRepo {
         },
       },
     });
-  }
+  };
 
   taskStatusCount = async (options: {
     by: ['status'];
@@ -22,5 +22,18 @@ export class ProjectRepo {
     _count?: Prisma.TaskCountAggregateInputType;
   }) => {
     return prisma.task.groupBy(options);
+  };
+  getProject = async (options: Prisma.ProjectFindUniqueArgs) => {
+    return prisma.project.findUnique({
+      ...options,
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        _count: {
+          select: { projectMembers: true },
+        },
+      },
+    });
   };
 }
