@@ -1,6 +1,6 @@
 import { ProjectRepo } from './project.repo';
 import { Project } from '../../types/project';
-import { prisma } from '../../libs/prisma';
+import { CustomError } from '../../libs/error';
 
 type createProject = Pick<Project, 'projectName' | 'description'>;
 
@@ -17,11 +17,12 @@ export class ProjectService {
     };
   }
   /* groupedTask 예시 
-     [
+  [
   { _count: { status: 2 }, status: 'todo' },
   { _count: { status: 2 }, status: 'in_progress' },
   { _count: { status: 1 }, status: 'done' }
-] */
+   ] 
+  */
 
   createProject = async (data: createProject, userId: number) => {
     const { projectName, description } = data;
@@ -39,7 +40,6 @@ export class ProjectService {
         },
       },
     });
-    console.log(project);
     const groupedTask = await this.repo.taskStatusCount({
       by: ['status'],
       where: { projectId: project.id },
@@ -58,6 +58,29 @@ export class ProjectService {
       doneCount: taskCounts['done'],
     };
 
+    return response;
+  };
+
+  getProject = async (projectId: number, userId: number) => {
+    const project = await this.repo.getProject({ where: { id: projectId } });
+    if (!project) {
+      throw new CustomError(404, '');
+    }
+    const groupedTask = await this.repo.taskStatusCount({
+      by: ['status'],
+      where: { projectId },
+      _count: { status: true },
+    });
+    const taskCounts = this.mapStatusCount(groupedTask);
+    const response = {
+      id: project['id'],
+      name: project['projectName'],
+      description: project['description'],
+      memberCount: project['_count']['projectMembers'],
+      todoCount: taskCounts['todo'],
+      inProgressCount: taskCounts['in_progress'],
+      doneCount: taskCounts['done'],
+    };
     return response;
   };
 }

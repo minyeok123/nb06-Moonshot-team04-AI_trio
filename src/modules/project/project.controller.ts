@@ -9,6 +9,13 @@ export class ProjectController {
     const project = await projectService.createProject(data, userId);
     return res.status(201).send(project);
   };
+
+  static getProject = async (req: Request, res: Response, next: NextFunction) => {
+    const { projectId } = req.params as unknown as { projectId: number };
+    const userId = req.user.id;
+    const project = await projectService.getProject(projectId, userId);
+    return res.status(200).send(project);
+  };
 }
 
 const projectRepo = new ProjectRepo();
