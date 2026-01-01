@@ -26,8 +26,21 @@ export class Authorize {
   };
 
   static projectMember = async (req: Request, res: Response, next: NextFunction) => {
-    // TODO: projectId로 멤버 확인
-    next();
+    try {
+      const { projectId } = req.params as unknown as { projectId: number };
+      const userId = req.user.id;
+
+      const existingMember = await prisma.projectMember.findUnique({
+        where: { userId_projectId: { userId, projectId } },
+      });
+
+      if (!existingMember) {
+        throw new CustomError(403, '프로젝트 멤버가 아닙니다.');
+      }
+      next();
+    } catch (err) {
+      next();
+    }
   };
 
   static subtaskProjectMember = async (req: Request, res: Response, next: NextFunction) => {

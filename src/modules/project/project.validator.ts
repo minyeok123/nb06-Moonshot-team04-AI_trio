@@ -5,4 +5,11 @@ export const CreateProject = z.object({
   description: z.string().min(1).max(40),
 });
 
-export type CreateProjectType = z.infer<typeof CreateProject>;
+export const paramsSchema = z.object({
+  projectId: z.coerce.number().int().positive(),
+});
+
+export const querySchema = z.object({
+  page: z.coerce.number().int().default(1),
+  sortBy: z.string(),
+});
