@@ -57,4 +57,8 @@ export class ProjectRepo {
       },
     });
   };
+
+  deleteProject = async (options: Prisma.ProjectDeleteArgs) => {
+    return prisma.project.delete(options);
+  };
 }
