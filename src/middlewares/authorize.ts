@@ -24,6 +24,24 @@ export class Authorize {
       next(e);
     }
   };
+  static existingProjectOwner = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { projectId } = req.params as unknown as { projectId: number };
+      const userId = req.user.id;
+      const existingOwner = await prisma.projectMember.findUnique({
+        where: { userId_projectId: { userId, projectId } },
+      });
+      if (!existingOwner) {
+        throw new CustomError(403, '프로젝트에 가입되지 않았습니다.');
+      }
+      if (existingOwner.role !== 'owner') {
+        throw new CustomError(403, '프로젝트 관리자가 아닙니다.');
+      }
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
 
   static projectMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -39,7 +57,7 @@ export class Authorize {
       }
       next();
     } catch (err) {
-      next();
+      next(err);
     }
   };
 

@@ -1,8 +1,10 @@
 import { ProjectRepo } from './project.repo';
 import { Project } from '../../types/project';
 import { CustomError } from '../../libs/error';
+import { prisma } from '../../libs/prisma';
 
-type createProject = Pick<Project, 'projectName' | 'description'>;
+type CreateProject = Pick<Project, 'projectName' | 'description'>;
+type PatchProject = Partial<CreateProject>;
 
 const TASK_STATUS = ['todo', 'in_progress', 'done'] as const;
 type TaskStatus = (typeof TASK_STATUS)[number];
@@ -24,10 +26,11 @@ export class ProjectService {
    ] 
   */
 
-  createProject = async (data: createProject, userId: number) => {
+  // 프로젝트 생성
+  createProject = async (data: CreateProject, userId: number) => {
     const { projectName, description } = data;
 
-    const project = await this.repo.create({
+    const project = await this.repo.createProject({
       data: {
         projectName,
         description,
@@ -61,7 +64,8 @@ export class ProjectService {
     return response;
   };
 
-  getProject = async (projectId: number, userId: number) => {
+  /* 프로젝트 상세 조회  */
+  getProject = async (projectId: number) => {
     const project = await this.repo.getProject({ where: { id: projectId } });
     if (!project) {
       throw new CustomError(404, '');
@@ -71,6 +75,32 @@ export class ProjectService {
       where: { projectId },
       _count: { status: true },
     });
+    const taskCounts = this.mapStatusCount(groupedTask);
+    const response = {
+      id: project['id'],
+      name: project['projectName'],
+      description: project['description'],
+      memberCount: project['_count']['projectMembers'],
+      todoCount: taskCounts['todo'],
+      inProgressCount: taskCounts['in_progress'],
+      doneCount: taskCounts['done'],
+    };
+    return response;
+  };
+
+  /* 프로젝트 수정 */
+  patchProject = async (projectId: number, data: PatchProject) => {
+    const { projectName, description } = data;
+    const project = await this.repo.patchProject({
+      data: { projectName, description },
+      where: { id: projectId },
+    });
+    const groupedTask = await this.repo.taskStatusCount({
+      by: ['status'],
+      where: { projectId },
+      _count: { status: true },
+    });
+
     const taskCounts = this.mapStatusCount(groupedTask);
     const response = {
       id: project['id'],
