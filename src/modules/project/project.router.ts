@@ -32,6 +32,14 @@ router
     authenticate,
     Authorize.existingProjectOwner,
     asyncHandler(ProjectController.patchProject),
+  )
+  .delete(
+    '/:projectId',
+    tokenValidate(),
+    validate(paramsSchema, 'params'),
+    authenticate,
+    Authorize.existingProjectOwner,
+    asyncHandler(ProjectController.deleteProject),
   );
 
 export default router;

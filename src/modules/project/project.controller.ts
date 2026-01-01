@@ -22,6 +22,12 @@ export class ProjectController {
     const project = await projectService.patchProject(projectId, data);
     return res.status(200).send(project);
   };
+
+  static deleteProject = async (req: Request, res: Response, next: NextFunction) => {
+    const { projectId } = req.params as unknown as { projectId: number };
+    const project = await projectService.deleteProject(projectId);
+    return res.status(204).send();
+  };
 }
 
 const projectRepo = new ProjectRepo();
