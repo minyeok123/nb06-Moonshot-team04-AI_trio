@@ -10,10 +10,10 @@ export class FileController {
         return res.status(400).json({ message: '파일이 없습니다.' });
       }
 
-      const fileUrl = fileService.createFileUrl(req.file);
+      // console.log(req.file.path);
 
       res.status(201).json({
-        fileUrl,
+        profileImage: req.file.path,
       });
     } catch (error) {
       next(error);

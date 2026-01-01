@@ -25,6 +25,8 @@ export class AuthController {
   };
 
   static register = async (req: Request, res: Response, next: NextFunction) => {
+    // console.log(req.file?.path);
+    // const data = { ...req.body, profileImgUrl: req.file?.path ?? null };
     const data = req.body;
     const userWithoutPassword = await authService.register(data);
     res.status(201).send(userWithoutPassword);
