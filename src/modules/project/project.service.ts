@@ -113,4 +113,13 @@ export class ProjectService {
     };
     return response;
   };
+
+  deleteProject = async (projectId: number) => {
+    const project = await this.repo.deleteProject({
+      where: { id: projectId },
+    });
+    if (!project) {
+      throw new CustomError(404, '');
+    }
+  };
 }
