@@ -13,3 +13,5 @@ export const querySchema = z.object({
   page: z.coerce.number().int().default(1),
   sortBy: z.string(),
 });
+
+export const PatchProjectSchema = CreateProject.partial();

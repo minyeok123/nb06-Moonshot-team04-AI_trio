@@ -21,9 +21,10 @@ export function globalErrorHandler(err: any, req: Request, res: Response, next: 
   // 2️⃣ Zod validation error 처리
   if (err instanceof ZodError) {
     return res.status(400).json({
-      type: 'ZodError',
-      issues: err.issues,
-      message: err.message,
+      // type: 'ZodError',
+      // issues: err.issues,
+      // message: err.message,
+      message: '잘못된 데이터 형식',
     });
   }
 
