@@ -12,8 +12,14 @@ export class ProjectController {
 
   static getProject = async (req: Request, res: Response, next: NextFunction) => {
     const { projectId } = req.params as unknown as { projectId: number };
-    const userId = req.user.id;
-    const project = await projectService.getProject(projectId, userId);
+    const project = await projectService.getProject(projectId);
+    return res.status(200).send(project);
+  };
+
+  static patchProject = async (req: Request, res: Response, next: NextFunction) => {
+    const { projectId } = req.params as unknown as { projectId: number };
+    const data = req.body;
+    const project = await projectService.patchProject(projectId, data);
     return res.status(200).send(project);
   };
 }

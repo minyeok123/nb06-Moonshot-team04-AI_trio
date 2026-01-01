@@ -2,7 +2,7 @@ import { prisma } from '../../libs/prisma';
 import { Prisma } from '@prisma/client';
 
 export class ProjectRepo {
-  create = async (data: Prisma.ProjectCreateArgs) => {
+  createProject = async (data: Prisma.ProjectCreateArgs) => {
     return prisma.project.create({
       ...data,
       select: {
@@ -10,7 +10,9 @@ export class ProjectRepo {
         projectName: true,
         description: true,
         _count: {
-          select: { projectMembers: true },
+          select: {
+            projectMembers: true,
+          },
         },
       },
     });
@@ -23,6 +25,7 @@ export class ProjectRepo {
   }) => {
     return prisma.task.groupBy(options);
   };
+
   getProject = async (options: Prisma.ProjectFindUniqueArgs) => {
     return prisma.project.findUnique({
       ...options,
@@ -31,7 +34,25 @@ export class ProjectRepo {
         projectName: true,
         description: true,
         _count: {
-          select: { projectMembers: true },
+          select: {
+            projectMembers: true,
+          },
+        },
+      },
+    });
+  };
+
+  patchProject = async (options: Prisma.ProjectUpdateArgs) => {
+    return prisma.project.update({
+      ...options,
+      select: {
+        id: true,
+        projectName: true,
+        description: true,
+        _count: {
+          select: {
+            projectMembers: true,
+          },
         },
       },
     });
