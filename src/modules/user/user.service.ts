@@ -11,6 +11,30 @@ type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
   checkNewPassword: string;
 };
 
+// API에서 받는 값(snake_case)
+type OrderByApi = 'created_at' | 'name';
+
+// Prisma(Project 모델)에서 쓰는 필드(camelCase)
+type OrderByPrisma = 'createdAt' | 'projectName';
+type OrderDir = 'asc' | 'desc';
+
+type ProjectListItem = {
+  id: number;
+  name: string;
+  description: string;
+  memberCount: number;
+  todoCount: number;
+  inProgressCount: number;
+  doneCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type ProjectListResponse = {
+  data: ProjectListItem[];
+  total: number;
+};
+
 export class UserService {
   constructor(private repo: UserRepo) {}
 
@@ -41,5 +65,54 @@ export class UserService {
     const { password: _, ...userInfo } = userUpdate;
 
     return userInfo;
+  };
+
+  getUserProjects = async ({
+    userId,
+    page,
+    limit,
+    order,
+    orderByKey,
+  }: {
+    userId: number;
+    page: number;
+    limit: number;
+    order: 'asc' | 'desc';
+    orderByKey: 'created_at' | 'name';
+  }) => {
+    const limitNum = Number(limit);
+    const skip = (page - 1) * limitNum;
+
+    const orderBy = orderByKey === 'created_at' ? { createdAt: order } : { projectName: order };
+
+    const [projects, total] = await Promise.all([
+      this.repo.findUserProjects({
+        userId,
+        skip,
+        take: limitNum,
+        orderBy,
+      }),
+      this.repo.countUserProjects(userId),
+    ]);
+
+    const data = projects.map((project) => {
+      const todoCount = project.tasks.filter((t) => t.status === 'todo').length;
+      const inProgressCount = project.tasks.filter((t) => t.status === 'in_progress').length;
+      const doneCount = project.tasks.filter((t) => t.status === 'done').length;
+
+      return {
+        id: project.id,
+        name: project.projectName,
+        description: project.description,
+        memberCount: project.projectMembers.length,
+        todoCount,
+        inProgressCount,
+        doneCount,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+      };
+    });
+
+    return { data, total };
   };
 }

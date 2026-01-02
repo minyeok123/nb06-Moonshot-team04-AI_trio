@@ -11,4 +11,47 @@ export class UserRepo {
       data: { password },
     });
   };
+
+  findUserProjects = async ({
+    userId,
+    skip,
+    take,
+    orderBy,
+  }: {
+    userId: number;
+    skip: number;
+    take: number;
+    orderBy: any;
+  }) => {
+    return prisma.project.findMany({
+      where: {
+        projectMembers: {
+          some: {
+            userId,
+            memberStatus: 'accepted',
+          },
+        },
+      },
+      skip,
+      take,
+      orderBy,
+      include: {
+        projectMembers: true,
+        tasks: true,
+      },
+    });
+  };
+
+  countUserProjects = async (userId: number) => {
+    return prisma.project.count({
+      where: {
+        projectMembers: {
+          some: {
+            userId,
+            memberStatus: 'accepted',
+          },
+        },
+      },
+    });
+  };
 }

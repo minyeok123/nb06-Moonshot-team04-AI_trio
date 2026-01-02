@@ -3,7 +3,7 @@ import { UserController } from './user.controller';
 import authenticate from '../../middlewares/authenticate';
 import asyncHandler from '../../libs/asyncHandler';
 import { validate } from '../../middlewares/validate';
-import { userPasswordValidator } from './user.validator';
+import { userPasswordValidator, getProjectListValidator } from './user.validator';
 
 const router = express.Router();
 
@@ -13,6 +13,12 @@ router.post(
   authenticate,
   validate(userPasswordValidator, 'body'),
   asyncHandler(UserController.userInfoChange),
+);
+router.get(
+  '/me/projects',
+  authenticate,
+  validate(getProjectListValidator, 'query'),
+  asyncHandler(UserController.userJoinProjects),
 );
 
 export default router;
