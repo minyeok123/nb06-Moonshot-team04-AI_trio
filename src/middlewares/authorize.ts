@@ -32,7 +32,7 @@ export class Authorize {
         where: { userId_projectId: { userId, projectId } },
       });
       if (!existingOwner) {
-        throw new CustomError(403, '프로젝트에 가입되지 않았습니다.');
+        throw new CustomError(404, '');
       }
       if (existingOwner.role !== 'owner') {
         throw new CustomError(403, '프로젝트 관리자가 아닙니다.');
@@ -48,6 +48,10 @@ export class Authorize {
       const { projectId } = req.params as unknown as { projectId: number };
       const userId = req.user.id;
 
+      const project = await prisma.project.findUnique({ where: { id: projectId } });
+      if (!project) {
+        throw new CustomError(404, '');
+      }
       const existingMember = await prisma.projectMember.findUnique({
         where: { userId_projectId: { userId, projectId } },
       });

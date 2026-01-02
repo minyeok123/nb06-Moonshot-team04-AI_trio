@@ -1,30 +1,14 @@
 import { ProjectRepo } from './project.repo';
 import { Project } from '../../types/project';
 import { CustomError } from '../../libs/error';
-import { prisma } from '../../libs/prisma';
+import { mapStatusCount } from './utils/project.mapper';
+import { mapResponse } from './dto/project.dto';
 
 type CreateProject = Pick<Project, 'projectName' | 'description'>;
 type PatchProject = Partial<CreateProject>;
 
-const TASK_STATUS = ['todo', 'in_progress', 'done'] as const;
-type TaskStatus = (typeof TASK_STATUS)[number];
-
 export class ProjectService {
   constructor(private repo: ProjectRepo) {}
-  mapStatusCount(grouped: { status: TaskStatus; _count?: { status?: number } }[]) {
-    return {
-      todo: grouped.find((g) => g.status === 'todo')?._count?.status ?? 0,
-      in_progress: grouped.find((g) => g.status === 'in_progress')?._count?.status ?? 0,
-      done: grouped.find((g) => g.status === 'done')?._count?.status ?? 0,
-    };
-  }
-  /* groupedTask 예시 
-  [
-  { _count: { status: 2 }, status: 'todo' },
-  { _count: { status: 2 }, status: 'in_progress' },
-  { _count: { status: 1 }, status: 'done' }
-   ] 
-  */
 
   // 프로젝트 생성
   createProject = async (data: CreateProject, userId: number) => {
@@ -49,18 +33,8 @@ export class ProjectService {
       _count: { status: true },
     });
 
-    const taskCounts = this.mapStatusCount(groupedTask);
-
-    const response = {
-      id: project['id'],
-      name: project['projectName'],
-      description: project['description'],
-      memberCount: project['_count']['projectMembers'],
-      todoCount: taskCounts['todo'],
-      inProgressCount: taskCounts['in_progress'],
-      doneCount: taskCounts['done'],
-    };
-
+    const taskCounts = mapStatusCount(groupedTask);
+    const response = mapResponse(project, taskCounts);
     return response;
   };
 
@@ -75,16 +49,9 @@ export class ProjectService {
       where: { projectId },
       _count: { status: true },
     });
-    const taskCounts = this.mapStatusCount(groupedTask);
-    const response = {
-      id: project['id'],
-      name: project['projectName'],
-      description: project['description'],
-      memberCount: project['_count']['projectMembers'],
-      todoCount: taskCounts['todo'],
-      inProgressCount: taskCounts['in_progress'],
-      doneCount: taskCounts['done'],
-    };
+
+    const taskCounts = mapStatusCount(groupedTask);
+    const response = mapResponse(project, taskCounts);
     return response;
   };
 
@@ -101,19 +68,12 @@ export class ProjectService {
       _count: { status: true },
     });
 
-    const taskCounts = this.mapStatusCount(groupedTask);
-    const response = {
-      id: project['id'],
-      name: project['projectName'],
-      description: project['description'],
-      memberCount: project['_count']['projectMembers'],
-      todoCount: taskCounts['todo'],
-      inProgressCount: taskCounts['in_progress'],
-      doneCount: taskCounts['done'],
-    };
+    const taskCounts = mapStatusCount(groupedTask);
+    const response = mapResponse(project, taskCounts);
     return response;
   };
-
+  
+  /* 프로젝트 삭제 */
   deleteProject = async (projectId: number) => {
     const project = await this.repo.deleteProject({
       where: { id: projectId },
