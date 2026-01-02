@@ -36,4 +36,10 @@ export class CommentRepo {
       select: this.selectOptions,
     });
   };
+  updateComment = async (options: Prisma.CommentUpdateArgs) => {
+    return prisma.comment.update({
+      ...options,
+      select: this.selectOptions,
+    });
+  };
 }
