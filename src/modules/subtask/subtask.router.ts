@@ -12,7 +12,7 @@ router.post(
   '/:taskId/subtasks',
   tokenValidate(),
   authenticate,
-  Authorize.subtaskProjectMember,
+  Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamsSchema, 'params'),
   validate(createSubtaskBodySchema, 'body'),
   asyncHandler(SubtaskController.createSubtask),
@@ -22,7 +22,7 @@ router.get(
   '/:taskId/subtasks',
   tokenValidate(),
   authenticate,
-  Authorize.subtaskProjectMember,
+  Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamsSchema, 'params'),
   asyncHandler(SubtaskController.getSubtasks),
 );

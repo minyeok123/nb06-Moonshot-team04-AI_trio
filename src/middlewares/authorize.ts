@@ -65,7 +65,7 @@ export class Authorize {
     }
   };
 
-  static subtaskProjectMember = async (req: Request, res: Response, next: NextFunction) => {
+  static taskOrSubtaskProjectMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { taskId, subtaskId } = req.params;
       const userId = req.user.id;

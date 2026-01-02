@@ -2,7 +2,7 @@ import { prisma } from '../../libs/prisma';
 import { Prisma } from '@prisma/client';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from '../../libs/constants';
-import token from './utils/token';
+import { hashData } from './utils/hash';
 
 export class AuthRepo {
   findUserByEmail = async (email: string) => {
@@ -17,7 +17,7 @@ export class AuthRepo {
   login = async (refresh: string, userId: number) => {
     const { exp } = jwt.verify(refresh, JWT_SECRET!) as JwtPayload;
     const expiresAt = new Date(exp! * 1000);
-    const hashedRefreshToken = await token.hashRefreshToken(refresh);
+    const hashedRefreshToken = await hashData(refresh);
     await prisma.refreshToken.upsert({
       where: { userId },
       create: {
@@ -28,6 +28,20 @@ export class AuthRepo {
       update: {
         token: hashedRefreshToken,
         expiresAt: expiresAt,
+      },
+    });
+  };
+  saveRefresh = async (refreshToken: string, userId: number, expiresAt: Date) => {
+    return await prisma.refreshToken.upsert({
+      where: { userId },
+      update: {
+        token: refreshToken,
+        expiresAt,
+      },
+      create: {
+        token: refreshToken,
+        userId,
+        expiresAt,
       },
     });
   };
