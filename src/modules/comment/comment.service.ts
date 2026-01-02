@@ -32,4 +32,26 @@ export class CommentService {
 
     return response;
   };
+
+  getCommentList = async (taskId: number, page: number = 1, limit: number = 10) => {
+    const commentList = await this.repo.getCommentList({
+      where: { taskId },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const response = commentList.map((comments) => ({
+      id: comments['id'],
+      content: comments['content'],
+      taskId: comments['taskId'],
+      author: {
+        id: comments['users']['id'],
+        name: comments['users']['email'],
+        profileImage: comments['users']?.['profileImgUrl'],
+      },
+      createdAt: comments['createdAt'],
+      updatedAt: comments['updatedAt'],
+    }));
+    return response;
+  };
 }

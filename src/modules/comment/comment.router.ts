@@ -4,17 +4,27 @@ import authenticate from '../../middlewares/authenticate';
 import { Authorize } from '../../middlewares/authorize';
 import { CommentController } from './comment.controller';
 import { tokenValidate, validate } from '../../middlewares/validate';
-import { CreateCommentSchema, TaskIdParamsSchema } from './comment.validate';
+import { CommentQuerySchema, CreateCommentSchema, TaskIdParamsSchema } from './comment.validate';
 const router = express.Router();
 
-router.post(
-  '/:taskId/comments',
-  tokenValidate(),
-  authenticate,
-  validate(CreateCommentSchema),
-  validate(TaskIdParamsSchema, 'params'),
-  Authorize.commentAuthorize,
-  asyncHandler(CommentController.createComment),
-);
+router
+  .post(
+    '/:taskId/comments',
+    tokenValidate(),
+    authenticate,
+    validate(CreateCommentSchema),
+    validate(TaskIdParamsSchema, 'params'),
+    Authorize.commentAuthorize,
+    asyncHandler(CommentController.createComment),
+  )
+  .get(
+    '/:taskId/comments',
+    tokenValidate(),
+    authenticate,
+    validate(TaskIdParamsSchema, 'params'),
+    validate(CommentQuerySchema, 'query'),
+    Authorize.commentAuthorize,
+    asyncHandler(CommentController.getCommentList),
+  );
 
 export default router;
