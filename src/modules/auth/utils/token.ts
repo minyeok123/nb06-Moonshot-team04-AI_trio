@@ -5,6 +5,10 @@ interface tokenPayloadUserid {
   id: number;
 }
 
+interface RefreshTokenPayload extends tokenPayloadUserid {
+  exp: number;
+}
+
 class Token {
   createTokens = (userId: number) => {
     const payload = { id: userId };
@@ -26,7 +30,7 @@ class Token {
   };
 
   verifyRefreshToken = (token: string) => {
-    return jwt.verify(token, JWT_REFRESH_SECRET!) as JwtPayload;
+    return jwt.verify(token, JWT_REFRESH_SECRET!) as RefreshTokenPayload;
   };
 }
 

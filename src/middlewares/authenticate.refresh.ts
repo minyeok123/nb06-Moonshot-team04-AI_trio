@@ -15,7 +15,7 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
     if (!saveOrNot) throw new CustomError(401, '토큰이 없습니다');
     const compareRefresh = await compareData(token, saveOrNot.token);
     if (!compareRefresh) throw new CustomError(401, '잘못된 접근입니다');
-    req.user = payload.id;
+    req.refresh = { id: payload.id };
     next();
   } catch (e) {
     next(e);
