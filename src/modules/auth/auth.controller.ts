@@ -10,7 +10,7 @@ export class AuthController {
   };
 
   static refresh = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user!.id;
+    const userId = req.refresh!.id;
     const token = await authService.refresh(userId);
     res.status(200).json(token);
   };

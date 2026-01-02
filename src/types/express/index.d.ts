@@ -5,6 +5,9 @@ declare global {
     interface Request {
       userId: number;
       user: UserInfo;
+      refresh?: {
+        id: number;
+      };
     }
   }
 }
