@@ -10,6 +10,8 @@ import invitationRouter from './modules/invitation/invitation.router';
 import subtaskRouter from './modules/subtask/subtask.router';
 import subtasksRouter from './modules/subtask/subtasks.router';
 import fileRouter from './modules/file/file.router';
+import commentRouter from './modules/comment/comment.router';
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +24,7 @@ app.use('/projects', memberRouter);
 app.use('/projects', projectRouter);
 app.use('/invitations', invitationRouter);
 app.use('/tasks', subtaskRouter);
+app.use('/tasks', commentRouter);
 app.use('/subtasks', subtasksRouter);
 
 app.use(defaultNotFoundHandler);
