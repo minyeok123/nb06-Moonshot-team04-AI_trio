@@ -17,7 +17,7 @@ export class Authorize {
       }
       if (!pid) throw new CustomError(400, '잘못된 요청 형식');
       const member = await memberRepo.findProjectMember(pid, operatorId);
-      if (!member) throw new CustomError(400, '잘못된 요청 형식');
+      if (!member) throw new CustomError(400, '프로젝트 멤버가 아닙니다');
       if (member.role !== 'owner') throw new CustomError(403, '프로젝트 관리자가 아닙니다');
       next();
     } catch (e) {
