@@ -49,6 +49,14 @@ router
     validate(PatchCommentSchema),
     Authorize.commentAuthorize,
     asyncHandler(CommentController.updateComment),
+  )
+  .delete(
+    '/:commentId',
+    tokenValidate(),
+    authenticate,
+    validate(CommentIdParamsSchema, 'params'),
+    Authorize.commentAuthorize,
+    asyncHandler(CommentController.deleteComment),
   );
 
 export default router;

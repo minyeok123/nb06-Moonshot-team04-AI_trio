@@ -42,4 +42,8 @@ export class CommentRepo {
       select: this.selectOptions,
     });
   };
+
+  deleteComment = async (options: Prisma.CommentDeleteArgs) => {
+    return prisma.comment.delete(options);
+  };
 }
