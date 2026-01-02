@@ -1,6 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-
-// 최종 파일 분리 시 지우기
 import { UserService } from './user.service';
 import { UserRepo } from './user.repo';
 
@@ -17,5 +15,26 @@ export class UserController {
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
     const userInfo = await userService.userInfoUpdate(req.body, req.user.id);
     res.status(200).json({ message: '비밀번호가 변경 되었습니다', userInfo });
+  };
+
+  static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.id;
+    const { page = 1, limit = 10, order, order_by } = req.query as any;
+
+    const result = await userService.getMyProjectList({
+      userId,
+      page,
+      limit,
+      order,
+      orderByKey: order_by,
+    });
+
+    res.status(200).json(result);
+  };
+
+  static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.id;
+    const tasks = await userService.getMyTaskList(userId, req.query);
+    res.status(200).json(tasks);
   };
 }
