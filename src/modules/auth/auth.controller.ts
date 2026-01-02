@@ -3,6 +3,12 @@ import { AuthRepo } from './auth.repo';
 import { AuthService } from './auth.service';
 
 export class AuthController {
+  static register = async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body;
+    const userWithoutPassword = await authService.register(data);
+    res.status(201).send(userWithoutPassword);
+  };
+
   static login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const { accessToken, refreshToken } = await authService.login(email, password);
@@ -13,12 +19,6 @@ export class AuthController {
     const userId = req.refresh!.id;
     const token = await authService.refresh(userId);
     res.status(200).json(token);
-  };
-
-  static register = async (req: Request, res: Response, next: NextFunction) => {
-    const data = req.body;
-    const userWithoutPassword = await authService.register(data);
-    res.status(201).send(userWithoutPassword);
   };
 }
 
