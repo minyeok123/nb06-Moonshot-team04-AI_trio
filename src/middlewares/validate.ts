@@ -25,7 +25,7 @@ export function tokenValidate() {
         authorization: z.string().startsWith('Bearer '),
       });
       const authHeader = req.headers.authorization;
-      const parsed = tokenSchema.parse({ authorization: authHeader });
+      const _ = tokenSchema.parse({ authorization: authHeader });
 
       next();
     } catch {
