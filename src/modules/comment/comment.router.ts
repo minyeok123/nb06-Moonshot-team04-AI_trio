@@ -4,7 +4,12 @@ import authenticate from '../../middlewares/authenticate';
 import { Authorize } from '../../middlewares/authorize';
 import { CommentController } from './comment.controller';
 import { tokenValidate, validate } from '../../middlewares/validate';
-import { CommentQuerySchema, CreateCommentSchema, TaskIdParamsSchema } from './comment.validate';
+import {
+  CommentIdParamsSchema,
+  CommentQuerySchema,
+  CreateCommentSchema,
+  TaskIdParamsSchema,
+} from './comment.validate';
 const router = express.Router();
 
 router
@@ -26,5 +31,13 @@ router
     Authorize.commentAuthorize,
     asyncHandler(CommentController.getCommentList),
   );
+router.get(
+  '/:commentId',
+  tokenValidate(),
+  authenticate,
+  validate(CommentIdParamsSchema, 'params'),
+  Authorize.commentAuthorize,
+  asyncHandler(CommentController.getCommentDetail),
+);
 
 export default router;

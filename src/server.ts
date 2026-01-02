@@ -24,6 +24,7 @@ app.use('/invitations', invitationRouter);
 app.use('/tasks', subtaskRouter);
 app.use('/tasks', commentRouter);
 app.use('/subtasks', subtasksRouter);
+app.use('/comments', commentRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
