@@ -54,4 +54,54 @@ export class UserRepo {
       },
     });
   };
+
+  findMyTasks = async (userId: number, query: any) => {
+    const { from, to, project_id, status, assignee_id, keyword } = query;
+
+    return prisma.task.findMany({
+      where: {
+        projectId: project_id,
+        status,
+        userId: assignee_id,
+        title: keyword ? { contains: keyword, mode: 'insensitive' } : undefined,
+        AND: [
+          from ? { startDate: { gte: new Date(from) } } : {},
+          to ? { endDate: { lte: new Date(to) } } : {},
+          {
+            projects: {
+              projectMembers: {
+                some: {
+                  userId,
+                  memberStatus: 'accepted',
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImgUrl: true,
+          },
+        },
+        taskWithTags: {
+          include: {
+            tags: true,
+          },
+        },
+        files: {
+          select: {
+            url: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  };
 }
