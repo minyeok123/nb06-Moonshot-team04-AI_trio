@@ -23,6 +23,13 @@ export class CommentController {
     const comment = await commentService.getCommentDetail(commentId);
     return res.status(200).send(comment);
   };
+
+  static updateComment = async (req: Request, res: Response, next: NextFunction) => {
+    const { commentId } = req.params as unknown as { commentId: number };
+    const { content } = req.body;
+    const comment = await commentService.updateComment(commentId, content);
+    return res.status(203).send(comment);
+  };
 }
 
 const commentRepo = new CommentRepo();

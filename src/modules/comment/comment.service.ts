@@ -53,7 +53,17 @@ export class CommentService {
       throw new CustomError(404, '댓글을 찾을 수 없습니다.');
     }
     const response = mapResponse(comment);
+    return response;
+  };
 
+  updateComment = async (commentId: number, content: string) => {
+    const comment = await this.repo.updateComment({
+      where: { id: commentId },
+      data: {
+        content,
+      },
+    });
+    const response = mapResponse(comment);
     return response;
   };
 }

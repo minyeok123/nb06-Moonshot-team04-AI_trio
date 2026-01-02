@@ -8,6 +8,7 @@ import {
   CommentIdParamsSchema,
   CommentQuerySchema,
   CreateCommentSchema,
+  PatchCommentSchema,
   TaskIdParamsSchema,
 } from './comment.validate';
 const router = express.Router();
@@ -31,13 +32,23 @@ router
     Authorize.commentAuthorize,
     asyncHandler(CommentController.getCommentList),
   );
-router.get(
-  '/:commentId',
-  tokenValidate(),
-  authenticate,
-  validate(CommentIdParamsSchema, 'params'),
-  Authorize.commentAuthorize,
-  asyncHandler(CommentController.getCommentDetail),
-);
+router
+  .get(
+    '/:commentId',
+    tokenValidate(),
+    authenticate,
+    validate(CommentIdParamsSchema, 'params'),
+    Authorize.commentAuthorize,
+    asyncHandler(CommentController.getCommentDetail),
+  )
+  .patch(
+    '/:commentId',
+    tokenValidate(),
+    authenticate,
+    validate(CommentIdParamsSchema, 'params'),
+    validate(PatchCommentSchema),
+    Authorize.commentAuthorize,
+    asyncHandler(CommentController.updateComment),
+  );
 
 export default router;
