@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { MemberRepo } from '../modules/member/member.repo';
 import { prisma } from '../libs/prisma';
 import { CustomError } from '../libs/error';
+import { unknown } from 'zod';
 
 export class Authorize {
   static projectOwner = async (req: Request, res: Response, next: NextFunction) => {
@@ -102,9 +103,54 @@ export class Authorize {
     }
   };
 
-  static ownerOnly = async (req: Request, res: Response, next: NextFunction) => {
-    // TODO: 댓글 등 작성자 확인
-    next();
+  static commentAuthorize = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user.id;
+      const { taskId, commentId } = req.params as unknown as {
+        taskId?: number;
+        commentId?: number;
+      };
+      let projectId: number | undefined;
+
+      // 1. 댓글 수정/삭제 요청인 경우 (commentId 존재)
+      if (commentId) {
+        const comment = await prisma.comment.findUnique({
+          where: { id: commentId },
+          include: { tasks: { select: { projectId: true } } },
+        });
+        if (!comment) throw new CustomError(404, '존재하지 않는 댓글입니다.');
+
+        // 작성자 본인 확인
+        if (comment.userId !== userId)
+          throw new CustomError(403, '자신이 작성한 댓글만 수정할 수 있습니다');
+
+        // 댓글 -> 태스크 -> 프로젝트 ID 추적
+        projectId = comment.tasks.projectId;
+      }
+
+      // 2. 댓글 생성 요청인 경우 (taskId 존재)
+      else if (taskId) {
+        const task = await prisma.task.findUnique({
+          where: { id: Number(taskId) },
+          select: { projectId: true },
+        });
+        if (!task) throw new CustomError(404, '존재하지 않는 태스크입니다.');
+        projectId = task.projectId;
+      }
+
+      // 3. 프로젝트 멤버 여부 확인 (공통 로직)
+      if (!projectId) throw new CustomError(400, '잘못된 요청입니다.');
+
+      const member = await prisma.projectMember.findUnique({
+        where: { userId_projectId: { userId, projectId } },
+      });
+
+      if (!member) throw new CustomError(403, '프로젝트 멤버가 아닙니다.');
+
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 
   static googleCalendarLinked = async (req: Request, res: Response, next: NextFunction) => {

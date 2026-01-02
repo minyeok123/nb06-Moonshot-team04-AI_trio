@@ -25,7 +25,7 @@ export class ProjectController {
 
   static deleteProject = async (req: Request, res: Response, next: NextFunction) => {
     const { projectId } = req.params as unknown as { projectId: number };
-    const project = await projectService.deleteProject(projectId);
+    await projectService.deleteProject(projectId);
     return res.status(204).send();
   };
 }
