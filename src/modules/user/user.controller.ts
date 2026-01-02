@@ -17,11 +17,11 @@ export class UserController {
     res.status(200).json({ message: '비밀번호가 변경 되었습니다', userInfo });
   };
 
-  static userJoinProjects = async (req: Request, res: Response, next: NextFunction) => {
+  static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
     const { page = 1, limit = 10, order, order_by } = req.query as any;
 
-    const result = await userService.getUserProjects({
+    const result = await userService.getMyProjectList({
       userId,
       page,
       limit,
@@ -30,5 +30,11 @@ export class UserController {
     });
 
     res.status(200).json(result);
+  };
+
+  static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.id;
+    const tasks = await userService.getMyTaskList(userId, req.query);
+    res.status(200).json(tasks);
   };
 }

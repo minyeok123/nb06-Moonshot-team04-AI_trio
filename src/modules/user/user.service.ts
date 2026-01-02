@@ -1,7 +1,5 @@
 import { User } from '../../types/user';
 import { UserRepo } from './user.repo';
-
-import { prisma } from '../../libs/prisma';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../../libs/error';
 
@@ -9,30 +7,6 @@ type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
   currentPassword: string;
   newPassword: string;
   checkNewPassword: string;
-};
-
-// API에서 받는 값(snake_case)
-type OrderByApi = 'created_at' | 'name';
-
-// Prisma(Project 모델)에서 쓰는 필드(camelCase)
-type OrderByPrisma = 'createdAt' | 'projectName';
-type OrderDir = 'asc' | 'desc';
-
-type ProjectListItem = {
-  id: number;
-  name: string;
-  description: string;
-  memberCount: number;
-  todoCount: number;
-  inProgressCount: number;
-  doneCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type ProjectListResponse = {
-  data: ProjectListItem[];
-  total: number;
 };
 
 export class UserService {
@@ -67,7 +41,7 @@ export class UserService {
     return userInfo;
   };
 
-  getUserProjects = async ({
+  getMyProjectList = async ({
     userId,
     page,
     limit,
@@ -114,5 +88,44 @@ export class UserService {
     });
 
     return { data, total };
+  };
+
+  getMyTaskList = async (userId: number, query: any) => {
+    const tasks = await this.repo.findMyTasks(userId, query);
+
+    return tasks.map((task) => ({
+      id: task.id,
+      projectId: task.projectId,
+      title: task.title,
+
+      startYear: task.startDate.getFullYear(),
+      startMonth: task.startDate.getMonth() + 1,
+      startDay: task.startDate.getDate(),
+
+      endYear: task.endDate.getFullYear(),
+      endMonth: task.endDate.getMonth() + 1,
+      endDay: task.endDate.getDate(),
+
+      status: task.status,
+
+      assignee: task.users
+        ? {
+            id: task.users.id,
+            name: task.users.name,
+            email: task.users.email,
+            profileImage: task.users.profileImgUrl,
+          }
+        : null,
+
+      tags: task.taskWithTags.map((t) => ({
+        id: t.tags.id,
+        name: t.tags.tag,
+      })),
+
+      attachments: task.files.map((f) => f.url),
+
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+    }));
   };
 }

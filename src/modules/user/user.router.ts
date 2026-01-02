@@ -4,7 +4,7 @@ import authenticate from '../../middlewares/authenticate';
 import asyncHandler from '../../libs/asyncHandler';
 import upload from '../../middlewares/upload';
 import { validate, tokenValidate } from '../../middlewares/validate';
-import { userPasswordValidator, getProjectListValidator } from './user.validator';
+import { userPasswordValidator, getMyProjectValidator, getMyTaskValidator } from './user.validator';
 
 const router = express.Router();
 
@@ -18,11 +18,19 @@ router.post(
   asyncHandler(UserController.userInfoChange),
 );
 router.get(
+  '/me/tasks',
+  tokenValidate(),
+  authenticate,
+  validate(getMyProjectValidator, 'query'),
+  asyncHandler(UserController.getMyProjects),
+);
+
+router.get(
   '/me/projects',
   tokenValidate(),
   authenticate,
-  validate(getProjectListValidator, 'query'),
-  asyncHandler(UserController.userJoinProjects),
+  validate(getMyTaskValidator, 'query'),
+  asyncHandler(UserController.getMyTasks),
 );
 
 export default router;
