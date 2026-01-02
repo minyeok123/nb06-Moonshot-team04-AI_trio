@@ -1,84 +1,76 @@
 import { prisma } from '../../libs/prisma';
 
+// interface createTask {
+//   title: string;
+//   status: 'todo' | 'in_progress' | 'done';
+//   startDate: Date;
+//   endDate: Date;
+//   tags: string[];
+//   files: string[] | null;
+// }
+
 export class TaskRepo {
-  findUserById = async (userId: number) => {
-    return await prisma.user.findUniqueOrThrow({ where: { id: userId! } });
-  };
+  // findUserById = async (userId: number) => {
+  //   return await prisma.user.findUniqueOrThrow({ where: { id: userId! } });
+  // };
 
-  updateUserInfo = async (userId: number, password: string) => {
-    return await await prisma.user.update({
-      where: { id: userId },
-      data: { password },
-    });
-  };
+  // createTask = async (data: createTask, projectId: number, userId: number) => {
+  //   return await prisma.task.create({
+  //     data: {
+  //       userId,
+  //       projectId,
+  //       ...data,
+  //     },
+  //   });
+  // };
 
-  findUserProjects = async ({
-    userId,
-    skip,
-    take,
-    orderBy,
-  }: {
+  createTask(data: {
     userId: number;
-    skip: number;
-    take: number;
-    orderBy: any;
-  }) => {
-    return prisma.project.findMany({
-      where: {
-        projectMembers: {
-          some: {
-            userId,
-            memberStatus: 'accepted',
-          },
-        },
-      },
-      skip,
-      take,
-      orderBy,
-      include: {
-        projectMembers: true,
-        tasks: true,
-      },
+    projectId: number;
+    title: string;
+    description: string;
+    status: 'todo' | 'in_progress' | 'done';
+    startDate: Date;
+    endDate: Date;
+  }) {
+    return prisma.task.create({
+      data,
     });
-  };
+  }
 
-  countUserProjects = async (userId: number) => {
-    return prisma.project.count({
-      where: {
-        projectMembers: {
-          some: {
-            userId,
-            memberStatus: 'accepted',
-          },
-        },
-      },
+  async upsertTags(tagNames: string[]) {
+    return Promise.all(
+      tagNames.map((tag) =>
+        prisma.tag.upsert({
+          where: { tag },
+          update: {},
+          create: { tag },
+        }),
+      ),
+    );
+  }
+
+  createTaskTags(taskId: number, tagIds: number[]) {
+    return prisma.taskWithTags.createMany({
+      data: tagIds.map((tagId) => ({
+        taskId,
+        tagId,
+      })),
     });
-  };
+  }
 
-  findMyTasks = async (userId: number, query: any) => {
-    const { from, to, project_id, status, assignee_id, keyword } = query;
+  createFiles(taskId: number, urls: string[]) {
+    return prisma.file.createMany({
+      data: urls.map((url) => ({
+        taskId,
+        url,
+      })),
+    });
+  }
 
-    return prisma.task.findMany({
-      where: {
-        projectId: project_id,
-        status,
-        userId: assignee_id,
-        title: keyword ? { contains: keyword, mode: 'insensitive' } : undefined,
-        AND: [
-          from ? { startDate: { gte: new Date(from) } } : {},
-          to ? { endDate: { lte: new Date(to) } } : {},
-          {
-            projects: {
-              projectMembers: {
-                some: {
-                  userId,
-                  memberStatus: 'accepted',
-                },
-              },
-            },
-          },
-        ],
-      },
+  findTaskWithRelations(taskId: number) {
+    return prisma.task.findUnique({
+      where: { id: taskId },
       include: {
         users: {
           select: {
@@ -93,15 +85,8 @@ export class TaskRepo {
             tags: true,
           },
         },
-        files: {
-          select: {
-            url: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
+        files: true,
       },
     });
-  };
+  }
 }
