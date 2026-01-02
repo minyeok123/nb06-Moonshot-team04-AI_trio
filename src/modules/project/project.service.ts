@@ -49,7 +49,6 @@ export class ProjectService {
       where: { projectId },
       _count: { status: true },
     });
-
     const taskCounts = mapStatusCount(groupedTask);
     const response = mapResponse(project, taskCounts);
     return response;
@@ -72,7 +71,7 @@ export class ProjectService {
     const response = mapResponse(project, taskCounts);
     return response;
   };
-  
+
   /* 프로젝트 삭제 */
   deleteProject = async (projectId: number) => {
     const project = await this.repo.deleteProject({
