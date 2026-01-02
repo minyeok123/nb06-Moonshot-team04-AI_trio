@@ -111,7 +111,7 @@ export class Authorize {
         commentId?: number;
       };
       let projectId: number | undefined;
-
+      let commentUserId: number | undefined;
       // 1. 댓글 수정/삭제 요청인 경우 (commentId 존재)
       if (commentId) {
         const comment = await prisma.comment.findUnique({
@@ -120,12 +120,9 @@ export class Authorize {
         });
         if (!comment) throw new CustomError(404, '존재하지 않는 댓글입니다.');
 
-        // 작성자 본인 확인
-        if (comment.userId !== userId)
-          throw new CustomError(403, '자신이 작성한 댓글만 수정할 수 있습니다');
-
         // 댓글 -> 태스크 -> 프로젝트 ID 추적
         projectId = comment.tasks.projectId;
+        commentUserId = comment.userId;
       }
 
       // 2. 댓글 생성 요청인 경우 (taskId 존재)
@@ -146,7 +143,9 @@ export class Authorize {
       });
 
       if (!member) throw new CustomError(403, '프로젝트 멤버가 아닙니다.');
-
+      if (commentId && commentUserId !== userId) {
+        throw new CustomError(403, '자신이 작성한 댓글만 수정할 수 있습니다');
+      }
       next();
     } catch (err) {
       next(err);

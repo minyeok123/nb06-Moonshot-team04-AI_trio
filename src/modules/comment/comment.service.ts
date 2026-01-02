@@ -1,6 +1,7 @@
 import { CommentRepo } from './comment.repo';
 import { CustomError } from '../../libs/error';
 import { Comment } from '../../types/comment';
+import { mapResponse } from './dto/comment.dto';
 
 type CreateComment = Pick<Comment, 'content'>;
 
@@ -17,18 +18,7 @@ export class CommentService {
       },
     });
 
-    const response = {
-      id: comment['id'],
-      content: comment['content'],
-      taskId: comment['taskId'],
-      author: {
-        id: comment['users']['id'],
-        name: comment['users']['email'],
-        profileImage: comment['users']?.['profileImgUrl'],
-      },
-      createdAt: comment['createdAt'],
-      updatedAt: comment['updatedAt'],
-    };
+    const response = mapResponse(comment);
 
     return response;
   };
@@ -52,6 +42,18 @@ export class CommentService {
       createdAt: comments['createdAt'],
       updatedAt: comments['updatedAt'],
     }));
+    return response;
+  };
+
+  getCommentDetail = async (commentId: number) => {
+    const comment = await this.repo.getCommentDetail({
+      where: { id: commentId },
+    });
+    if (!comment) {
+      throw new CustomError(404, '댓글을 찾을 수 없습니다.');
+    }
+    const response = mapResponse(comment);
+
     return response;
   };
 }
