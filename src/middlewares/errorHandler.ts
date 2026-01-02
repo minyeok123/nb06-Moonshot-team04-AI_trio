@@ -11,11 +11,18 @@ export function globalErrorHandler(err: any, req: Request, res: Response, next: 
   console.log(err);
   // 1️⃣ Prisma known error 처리
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    return res.status(400).json({
-      type: 'PrismaClientKnownRequestError',
-      code: err.code,
-      message: err.message,
-    });
+    if (err.code === 'P2002') {
+      return res.status(409).json({
+        message: '이미 존재하는 값입니다',
+        field: err.meta?.targer,
+      });
+    }
+    if (err.code === 'P2025') {
+      return res.status(404).json({
+        message: '요청한 리소스를 찾을 수 없습니다',
+        field: err.meta?.targer,
+      });
+    }
   }
 
   // 2️⃣ Zod validation error 처리
@@ -39,6 +46,6 @@ export function globalErrorHandler(err: any, req: Request, res: Response, next: 
   const statusCode = err.status || 500;
   return res.status(statusCode).json({
     type: 'UnknownError',
-    message: err.message || 'Internal Server Error',
+    message: err.message || '서버 통신 오류',
   });
 }

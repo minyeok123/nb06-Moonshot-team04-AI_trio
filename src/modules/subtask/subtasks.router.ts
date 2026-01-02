@@ -12,7 +12,7 @@ router.get(
   '/:subtaskId',
   tokenValidate(),
   authenticate,
-  Authorize.subtaskProjectMember,
+  Authorize.taskOrSubtaskProjectMember,
   validate(subtaskIdParamSchema, 'params'),
   asyncHandler(SubtaskController.getSubtask),
 );
@@ -21,7 +21,7 @@ router.patch(
   '/:subtaskId',
   tokenValidate(),
   authenticate,
-  Authorize.subtaskProjectMember,
+  Authorize.taskOrSubtaskProjectMember,
   validate(subtaskIdParamSchema, 'params'),
   validate(updateSubtaskBodySchema, 'body'),
   asyncHandler(SubtaskController.updateSubtask),
@@ -31,7 +31,7 @@ router.delete(
   '/:subtaskId',
   tokenValidate(),
   authenticate,
-  Authorize.subtaskProjectMember,
+  Authorize.taskOrSubtaskProjectMember,
   validate(subtaskIdParamSchema, 'params'),
   asyncHandler(SubtaskController.deleteSubtask),
 );
