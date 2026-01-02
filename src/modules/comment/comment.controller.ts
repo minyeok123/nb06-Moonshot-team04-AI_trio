@@ -10,6 +10,13 @@ export class CommentController {
     const comment = await commentService.createComment(taskId, userId, data);
     return res.status(201).send(comment);
   };
+
+  static getCommentList = async (req: Request, res: Response, next: NextFunction) => {
+    const { taskId } = req.params as unknown as { taskId: number };
+    const { page, limit } = req.query as unknown as { page: number; limit: number };
+    const commentList = await commentService.getCommentList(taskId, page, limit);
+    return res.status(200).send(commentList);
+  };
 }
 
 const commentRepo = new CommentRepo();

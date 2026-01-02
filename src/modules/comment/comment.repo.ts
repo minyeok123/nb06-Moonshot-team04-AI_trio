@@ -22,4 +22,24 @@ export class CommentRepo {
       },
     });
   };
+  getCommentList = async (options: Prisma.CommentFindManyArgs) => {
+    return prisma.comment.findMany({
+      ...options,
+      select: {
+        id: true,
+        content: true,
+        taskId: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImgUrl: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  };
 }
