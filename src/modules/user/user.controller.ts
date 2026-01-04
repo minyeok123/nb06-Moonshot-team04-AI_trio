@@ -13,8 +13,9 @@ export class UserController {
   };
 
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
-    const userInfo = await userService.userInfoUpdate(req.body, req.user.id);
-    res.status(200).json({ message: '비밀번호가 변경 되었습니다', userInfo });
+    const data = { ...req.body, profileImgUrl: req.file?.path ?? null };
+    const userInfo = await userService.userInfoUpdate(data, req.user.id);
+    res.status(200).json({ userInfo });
   };
 
   static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {

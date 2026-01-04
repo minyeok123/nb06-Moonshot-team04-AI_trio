@@ -9,7 +9,7 @@ import { userPasswordValidator, getMyProjectValidator, getMyTaskValidator } from
 const router = express.Router();
 
 router.get('/me', tokenValidate(), authenticate, asyncHandler(UserController.userInfo));
-router.post(
+router.patch(
   '/me',
   tokenValidate(),
   authenticate,

@@ -5,10 +5,17 @@ export class UserRepo {
     return await prisma.user.findUniqueOrThrow({ where: { id: userId! } });
   };
 
-  updateUserInfo = async (userId: number, password: string) => {
+  updateUserInfoImg = async (userId: number, profileImgUrl: string | null) => {
     return await await prisma.user.update({
       where: { id: userId },
-      data: { password },
+      data: { profileImgUrl },
+    });
+  };
+
+  updateUserInfoAll = async (userId: number, profileImgUrl: string | null, password: string) => {
+    return await await prisma.user.update({
+      where: { id: userId },
+      data: { profileImgUrl, password },
     });
   };
 
