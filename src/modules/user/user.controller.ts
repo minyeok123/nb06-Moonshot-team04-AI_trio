@@ -13,7 +13,7 @@ export class UserController {
   };
 
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.file?.path ?? null };
+    const data = { ...req.body, profileImgUrl: req.body.img ?? null };
     const userInfo = await userService.userInfoUpdate(data, req.user.id);
     res.status(200).json({ userInfo });
   };

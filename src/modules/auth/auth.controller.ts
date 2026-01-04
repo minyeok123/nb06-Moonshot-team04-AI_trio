@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 
 export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.file?.path ?? null };
+    const data = { ...req.body, profileImgUrl: req.body.img ?? null };
     const userWithoutPassword = await authService.register(data);
     res.status(201).send(userWithoutPassword);
   };
