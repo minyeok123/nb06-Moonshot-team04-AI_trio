@@ -81,4 +81,53 @@ export class TaskService {
 
     return this.repo.findTaskWithRelations(task.id);
   };
+
+  taskList = async (
+    projectId: number,
+    query: {
+      page: number;
+      limit: number;
+      status?: 'todo' | 'in_progress' | 'done';
+      assignee?: number;
+      keyword?: string;
+      order: 'asc' | 'desc';
+      order_by: 'created_at' | 'name' | 'end_date';
+    },
+  ) => {
+    const { data, total } = await this.repo.findManyWithTotal({
+      projectId,
+      ...query,
+    });
+
+    return {
+      data: data.map((task) => ({
+        id: task.id,
+        projectId: task.projectId,
+        title: task.title,
+        startYear: task.startDate.getFullYear(),
+        startMonth: task.startDate.getMonth() + 1,
+        startDay: task.startDate.getDate(),
+        endYear: task.endDate.getFullYear(),
+        endMonth: task.endDate.getMonth() + 1,
+        endDay: task.endDate.getDate(),
+        status: task.status,
+        assignee: task.users
+          ? {
+              id: task.users.id,
+              name: task.users.name,
+              email: task.users.email,
+              profileImage: task.users.profileImgUrl,
+            }
+          : null,
+        tags: task.taskWithTags.map((t) => ({
+          id: t.tags.id,
+          name: t.tags.tag,
+        })),
+        attachments: task.files.map((f) => f.url),
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+      })),
+      total,
+    };
+  };
 }

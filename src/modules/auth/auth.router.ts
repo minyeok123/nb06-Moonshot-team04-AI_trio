@@ -8,7 +8,6 @@ import { verifyState } from '../../middlewares/googleAuth';
 
 const router = express.Router();
 
-//upload.single('files'),
 router.post(
   '/register',
   upload.single('profileImage'),

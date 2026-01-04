@@ -14,9 +14,14 @@ export const taskValidator = z.object({
   attachments: z.array(z.string()).default([]),
 });
 
-// export const getTaskValidator = z.object({
-//   page: z.coerce.number().int().min(1).default(1).optional(),
-//   limit: z.coerce.number().int().min(1).max(50).default(10).optional(),
-//   order: z.enum(['asc', 'desc']).default('desc').optional(),
-//   order_by: z.enum(['created_at', 'name']).default('created_at').optional(),
-// });
+export const listTaskQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+
+  status: z.enum(['todo', 'in_progress', 'done']).optional(),
+  assignee: z.coerce.number().int().positive().optional(), // userId 필터로 사용
+  keyword: z.string().trim().min(1).optional(),
+
+  order: z.enum(['asc', 'desc']).default('desc'),
+  order_by: z.enum(['created_at', 'name', 'end_date']).default('created_at'),
+});
