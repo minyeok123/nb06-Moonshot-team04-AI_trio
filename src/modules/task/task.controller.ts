@@ -51,11 +51,9 @@ export class TaskController {
   static taskList = async (req: Request, res: Response, next: NextFunction) => {
     const projectId = Number(req.params.projectId);
 
-    // validate 미들웨어에서 req.query를 파싱해서 넣었다는 가정
-    // (이전에 req.query에 직접 할당하면 getter 에러났었죠 → validatedQuery 쓰는 방식 추천)
-    const q = (req as any).validatedQuery ?? req.query;
+    const data = req.query as any;
 
-    const result = await taskService.taskList(projectId, q);
+    const result = await taskService.taskList(projectId, data);
 
     res.status(200).json(result);
   };

@@ -46,12 +46,16 @@ export class Authorize {
 
   static projectMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { projectId } = req.params as unknown as { projectId: number };
+      const projectId = Number(req.params.projectId);
       const userId = req.user.id;
+
+      if (Number.isNaN(projectId)) {
+        throw new CustomError(400, 'projectId가 올바르지 않습니다.');
+      }
 
       const project = await prisma.project.findUnique({ where: { id: projectId } });
       if (!project) {
-        throw new CustomError(404, '');
+        throw new CustomError(404, 'Project 정보가 없습니다.');
       }
       const existingMember = await prisma.projectMember.findUnique({
         where: { userId_projectId: { userId, projectId } },

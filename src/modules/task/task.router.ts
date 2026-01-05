@@ -5,6 +5,8 @@ import { Authorize } from '../../middlewares/authorize';
 import asyncHandler from '../../libs/asyncHandler';
 import { validate, tokenValidate } from '../../middlewares/validate';
 import { taskValidator, listTaskQuerySchema } from './task.validator';
+import upload from '../../middlewares/upload';
+import { attachFilePath } from '../../middlewares/attachFilePath';
 
 const router = express.Router();
 
@@ -12,7 +14,9 @@ router.post(
   '/:projectId/tasks',
   tokenValidate(),
   authenticate,
-  // Authorize.projectMember,
+  Authorize.projectMember,
+  upload.single('attachments'),
+  attachFilePath,
   validate(taskValidator, 'body'),
   asyncHandler(TaskController.createTask),
 );
