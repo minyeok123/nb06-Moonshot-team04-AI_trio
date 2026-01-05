@@ -38,4 +38,25 @@ export class UserController {
     const tasks = await userService.getMyTaskList(userId, req.query);
     res.status(200).json(tasks);
   };
+
+  static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.id;
+    const { page = 1, limit = 10, order, order_by } = req.query as any;
+
+    const result = await userService.getMyProjectList({
+      userId,
+      page,
+      limit,
+      order,
+      orderByKey: order_by,
+    });
+
+    res.status(200).json(result);
+  };
+
+  static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.id;
+    const tasks = await userService.getMyTaskList(userId, req.query);
+    res.status(200).json(tasks);
+  };
 }
