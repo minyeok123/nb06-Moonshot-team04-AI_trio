@@ -4,6 +4,14 @@ import type { User } from '../../types/user';
 import token from './utils/token';
 import { CustomError } from '../../libs/error';
 import { compareData, hashData } from './utils/hash';
+import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI,
+  RESPONSE_TYPE,
+} from '../../libs/constants';
+import axios from 'axios';
+import { encryptToken } from './utils/crypt';
 
 type RegisterData = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password: string };
 type ResponseUser = Pick<User, 'id' | 'email' | 'name' | 'createdAt' | 'updatedAt'> & {
@@ -31,7 +39,6 @@ export class AuthService {
       },
     };
 
-    
     const user = await this.repo.create(dataToSave);
     const { password: _, ...userWithoutPassword } = user;
     const response: ResponseUser = {
@@ -65,4 +72,77 @@ export class AuthService {
     const _ = await this.repo.saveRefresh(hashedrefreshToken, id, expiresAt);
     return { accessToken, refreshToken };
   };
+
+  async googleLogin(state: string) {
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID!,
+      redirect_uri: GOOGLE_REDIRECT_URI!,
+      response_type: RESPONSE_TYPE!,
+      scope: 'openid email profile https://www.googleapis.com/auth/calendar',
+      state: state,
+      access_type: 'offline',
+      prompt: 'consent',
+    });
+    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  }
+
+  async googleLoginByGoogleInfo(code: string) {
+    const url = 'https://oauth2.googleapis.com/token';
+    const params = new URLSearchParams({
+      code,
+      client_id: GOOGLE_CLIENT_ID!,
+      client_secret: GOOGLE_CLIENT_SECRET!,
+      redirect_uri: GOOGLE_REDIRECT_URI!,
+      grant_type: 'authorization_code',
+    });
+    const response = await axios.post(url, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    const { access_token, refresh_token, id_token, expires_in } = response.data;
+    const encryptedAccess = encryptToken(access_token);
+    const encryptedRefresh = encryptToken(refresh_token);
+    const { sub, email, name, picture } = token.decodeToken(id_token);
+    const expiresAt = new Date(expires_in * 1000);
+    const savedUser = await this.repo.findOAuthByEmail(email);
+    const existingOAuth = savedUser?.oauths.find(
+      (oauth) => oauth.providerId === sub && oauth.provider === 'google',
+    );
+    if (existingOAuth) {
+      const updateOAuth = await this.repo.updateOAuth(
+        encryptedAccess,
+        encryptedRefresh,
+        expiresAt,
+        sub,
+        'google',
+      );
+      if (!updateOAuth) throw new CustomError(404, '구글 로그인 실패');
+      const { accessToken, refreshToken } = token.createTokens(updateOAuth.userId);
+      const { id, exp } = token.verifyRefreshToken(refreshToken);
+      const refreshTokenExpiresAt = new Date(exp! * 1000);
+      const hashedrefreshToken = await hashData(refreshToken);
+      const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
+      return { accessToken, refreshToken };
+    }
+    if (!existingOAuth) {
+      const createUser = await this.repo.createOAuth(
+        email,
+        name,
+        picture,
+        encryptedAccess,
+        encryptedRefresh,
+        expiresAt,
+        sub,
+        'google',
+      );
+      if (!createUser) throw new CustomError(404, '구글 로그인 실패');
+      const { accessToken, refreshToken } = token.createTokens(createUser.id);
+      const { id, exp } = token.verifyRefreshToken(refreshToken);
+      const refreshTokenExpiresAt = new Date(exp! * 1000);
+      const hashedrefreshToken = await hashData(refreshToken);
+      const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
+      return { accessToken, refreshToken };
+    }
+  }
 }

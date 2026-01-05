@@ -1,5 +1,6 @@
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { JWT_REFRESH_SECRET, JWT_SECRET } from '../../../libs/constants';
+import { CustomError } from '../../../libs/error';
 
 interface tokenPayloadUserid {
   id: number;
@@ -31,6 +32,12 @@ class Token {
 
   verifyRefreshToken = (token: string) => {
     return jwt.verify(token, JWT_REFRESH_SECRET!) as RefreshTokenPayload;
+  };
+
+  decodeToken = (token: string) => {
+    const decoded = jwt.decode(token) as { [key: string]: any } | null;
+    if (!decoded) throw new CustomError(404, '유효하지 않은 토큰 입니다');
+    return decoded;
   };
 }
 

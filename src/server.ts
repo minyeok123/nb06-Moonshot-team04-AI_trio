@@ -1,5 +1,5 @@
 import express from 'express';
-import { PORT } from './libs/constants';
+import { FRONTEND_URL, PORT, SESSION_SECRET } from './libs/constants';
 import cors from 'cors';
 import authRouter from './modules/auth/auth.router';
 import userRouter from './modules/user/user.router';
@@ -11,11 +11,31 @@ import subtaskRouter from './modules/subtask/subtask.router';
 import subtasksRouter from './modules/subtask/subtasks.router';
 import commentRouter from './modules/comment/comment.router';
 import fileRouter from './modules/file/file.router';
+import session from 'express-session';
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: FRONTEND_URL!,
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
 app.use(express.json());
+
+app.use(
+  session({
+    secret: SESSION_SECRET! || 'dev-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    },
+  }),
+);
 
 app.use('/files', fileRouter);
 app.use('/auth', authRouter);
