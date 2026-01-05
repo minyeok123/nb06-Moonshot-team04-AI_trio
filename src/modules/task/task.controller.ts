@@ -1,19 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { TaskService } from './task.service';
 import { TaskRepo } from './task.repo';
+import { taskIdParamSchema, updateTaskBodySchema } from './task.validator';
 
 const taskRepo = new TaskRepo();
 const taskService = new TaskService(taskRepo);
 
 export class TaskController {
   static createTask = async (req: Request, res: Response, next: NextFunction) => {
-    // const body = req.body;
-    // const projectId = Number(req.params);
-    // const userId = Number(req.user.id);
-
-    // const task = await taskService.createTask(body, projectId, userId);
-
-    // res.status(200).json(task);
     const projectId = Number(req.params.projectId);
     const userId = req.user.id; // authenticate 미들웨어 전제
 
@@ -56,5 +50,30 @@ export class TaskController {
     const result = await taskService.taskList(projectId, data);
 
     res.status(200).json(result);
+  };
+
+  static getTaskById = async (req: Request, res: Response, next: NextFunction) => {
+    const taskId = Number(req.params.taskId);
+
+    const task = await taskService.getTaskById(taskId);
+
+    res.status(200).json(task);
+  };
+
+  static updateTask = async (req: Request, res: Response, next: NextFunction) => {
+    const taskId = Number(req.params.taskId);
+    const body = req.body;
+    const userId = req.user.id;
+
+    const result = await taskService.updateTask(taskId, body, userId);
+    return res.status(200).json(result);
+  };
+
+  static deleteTask = async (req: Request, res: Response, next: NextFunction) => {
+    const taskId = Number(req.params.taskId);
+
+    await taskService.deleteTask(taskId);
+
+    res.status(204).send();
   };
 }

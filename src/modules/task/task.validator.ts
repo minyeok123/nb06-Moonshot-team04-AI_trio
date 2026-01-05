@@ -25,3 +25,27 @@ export const listTaskQuerySchema = z.object({
   order: z.enum(['asc', 'desc']).default('desc'),
   order_by: z.enum(['created_at', 'name', 'end_date']).default('created_at'),
 });
+
+export const taskIdParamSchema = z.object({
+  taskId: z.coerce.number().int().positive(),
+});
+
+export const updateTaskBodySchema = z.object({
+  title: z.string().min(1).max(200),
+  startYear: z.coerce.number().int().min(1970).max(3000),
+  startMonth: z.coerce.number().int().min(1).max(12),
+  startDay: z.coerce.number().int().min(1).max(31),
+
+  endYear: z.coerce.number().int().min(1970).max(3000),
+  endMonth: z.coerce.number().int().min(1).max(12),
+  endDay: z.coerce.number().int().min(1).max(31),
+
+  status: z.enum(['todo', 'in_progress', 'done']),
+  assigneeId: z.coerce.number().int().positive(),
+
+  tags: z.array(z.string().min(1).max(50)).default([]),
+  attachments: z.array(z.string().url()).default([]),
+});
+
+export type UpdateTaskBodyDto = z.infer<typeof updateTaskBodySchema>;
+export type TaskIdParamDto = z.infer<typeof taskIdParamSchema>;

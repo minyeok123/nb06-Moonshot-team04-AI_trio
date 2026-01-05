@@ -38,6 +38,7 @@ app.use(
   }),
 );
 
+app.use('/tasks', taskRouter);
 app.use('/files', fileRouter);
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
@@ -49,6 +50,7 @@ app.use('/tasks', commentRouter);
 app.use('/subtasks', subtasksRouter);
 app.use('/comments', commentRouter);
 app.use('/projects', taskRouter);
+app.use('/tasks', taskRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
