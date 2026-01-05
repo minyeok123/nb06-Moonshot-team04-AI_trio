@@ -19,6 +19,7 @@ export class AuthService {
     if (existingUser) {
       throw new CustomError(401, '이미 가입한 이메일 입니다.');
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     const dataToSave = {
@@ -29,6 +30,8 @@ export class AuthService {
         profileImgUrl: data.profileImgUrl,
       },
     };
+
+    
     const user = await this.repo.create(dataToSave);
     const { password: _, ...userWithoutPassword } = user;
     const response: ResponseUser = {

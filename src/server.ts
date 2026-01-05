@@ -10,12 +10,14 @@ import invitationRouter from './modules/invitation/invitation.router';
 import subtaskRouter from './modules/subtask/subtask.router';
 import subtasksRouter from './modules/subtask/subtasks.router';
 import commentRouter from './modules/comment/comment.router';
+import fileRouter from './modules/file/file.router';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+app.use('/files', fileRouter);
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/projects', memberRouter);
