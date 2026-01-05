@@ -30,6 +30,12 @@ export class CommentController {
     const comment = await commentService.updateComment(commentId, content);
     return res.status(203).send(comment);
   };
+
+  static deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+    const { commentId } = req.params as unknown as { commentId: number };
+    await commentService.deletedComment(commentId);
+    return res.status(204).send();
+  };
 }
 
 const commentRepo = new CommentRepo();

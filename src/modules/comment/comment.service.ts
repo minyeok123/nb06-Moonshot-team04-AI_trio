@@ -66,4 +66,10 @@ export class CommentService {
     const response = mapResponse(comment);
     return response;
   };
+
+  deletedComment = async (commentId: number) => {
+    await this.repo.deleteComment({
+      where: { id: commentId },
+    });
+  };
 }

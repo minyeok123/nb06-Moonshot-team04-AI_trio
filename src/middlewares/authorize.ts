@@ -144,7 +144,7 @@ export class Authorize {
 
       if (!member) throw new CustomError(403, '프로젝트 멤버가 아닙니다.');
       if (commentId && commentUserId !== userId) {
-        throw new CustomError(403, '자신이 작성한 댓글만 수정할 수 있습니다');
+        throw new CustomError(403, '자신이 작성한 댓글만 수정 및 삭제 할 수 있습니다');
       }
       next();
     } catch (err) {
