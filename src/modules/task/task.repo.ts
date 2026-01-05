@@ -80,7 +80,7 @@ export class TaskRepo {
     order: Order;
     order_by: OrderBy;
   }) => {
-    const { projectId, page, limit, status, assignee, keyword, order, order_by } = params;
+    const { projectId, page = 1, limit = 10, status, assignee, keyword, order, order_by } = params;
 
     const where = {
       projectId,
@@ -97,8 +97,9 @@ export class TaskRepo {
     };
 
     const orderBy = this.toOrderBy(order_by, order);
-
-    const skip = (page - 1) * limit;
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    const skip = (pageNum - 1) * limitNum;
 
     const [data, total] = await Promise.all([
       prisma.task.findMany({

@@ -76,6 +76,8 @@ export class TaskService {
       order_by: 'created_at' | 'name' | 'end_date';
     },
   ) => {
+
+    
     const { data, total } = await this.repo.findManyWithTotal({
       projectId,
       ...query,

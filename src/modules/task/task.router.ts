@@ -25,7 +25,7 @@ router.get(
   '/:projectId/tasks',
   tokenValidate(),
   authenticate,
-  // Authorize.projectMember,
+  Authorize.projectMember,
   validate(listTaskQuerySchema, 'query'),
   asyncHandler(TaskController.taskList),
 );

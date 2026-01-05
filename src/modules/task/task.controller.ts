@@ -7,13 +7,6 @@ const taskService = new TaskService(taskRepo);
 
 export class TaskController {
   static createTask = async (req: Request, res: Response, next: NextFunction) => {
-    // const body = req.body;
-    // const projectId = Number(req.params);
-    // const userId = Number(req.user.id);
-
-    // const task = await taskService.createTask(body, projectId, userId);
-
-    // res.status(200).json(task);
     const projectId = Number(req.params.projectId);
     const userId = req.user.id; // authenticate 미들웨어 전제
 
