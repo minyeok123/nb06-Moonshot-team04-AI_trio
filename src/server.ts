@@ -12,6 +12,7 @@ import subtasksRouter from './modules/subtask/subtasks.router';
 import commentRouter from './modules/comment/comment.router';
 import fileRouter from './modules/file/file.router';
 import session from 'express-session';
+import taskRouter from './modules/task/task.router';
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/tasks', subtaskRouter);
 app.use('/tasks', commentRouter);
 app.use('/subtasks', subtasksRouter);
 app.use('/comments', commentRouter);
+app.use('/projects', taskRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
