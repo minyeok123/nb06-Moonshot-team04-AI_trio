@@ -176,9 +176,11 @@ model RefreshToken {
   id        Int      @id @default(autoincrement())
   token     String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  userId    Int      @unique @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
 }
 
 enum Provider {
