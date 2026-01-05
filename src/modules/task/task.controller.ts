@@ -13,33 +13,7 @@ export class TaskController {
 
     const task = await taskService.createTask(userId, projectId, req.body);
 
-    res.status(200).json({
-      id: task!.id,
-      projectId: task!.projectId,
-      title: task!.title,
-      startYear: task!.startDate.getFullYear(),
-      startMonth: task!.startDate.getMonth() + 1,
-      startDay: task!.startDate.getDate(),
-      endYear: task!.endDate.getFullYear(),
-      endMonth: task!.endDate.getMonth() + 1,
-      endDay: task!.endDate.getDate(),
-      status: task!.status,
-      assignee: task!.users
-        ? {
-            id: task!.users.id,
-            name: task!.users.name,
-            email: task!.users.email,
-            profileImage: task!.users.profileImgUrl,
-          }
-        : null,
-      tags: task!.taskWithTags.map((t) => ({
-        id: t.tags.id,
-        name: t.tags.tag,
-      })),
-      attachments: task!.files.map((f) => f.url),
-      createdAt: task!.createdAt,
-      updatedAt: task!.updatedAt,
-    });
+    res.status(200).json(task);
   };
 
   static taskList = async (req: Request, res: Response, next: NextFunction) => {

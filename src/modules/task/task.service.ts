@@ -62,19 +62,42 @@ export class TaskService {
 
     if (dto.tags.length > 0) {
       const normalizedTags = this.normalizeTags(dto.tags);
-      const tags = await this.repo.upsertTags(normalizedTags);
-
-      await this.repo.createTaskTags(
-        task.id,
-        tags.map((t) => t.id),
-      );
+      await this.repo.upsertTags(normalizedTags);
     }
 
     if (dto.attachments.length > 0) {
       await this.repo.createFiles(task.id, dto.attachments);
     }
 
-    return this.repo.findTaskWithRelations(task.id);
+    const createTask = await this.repo.findTaskWithRelations(task.id);
+
+    return {
+      id: createTask!.id,
+      projectId: createTask!.projectId,
+      title: createTask!.title,
+      startYear: createTask!.startDate.getFullYear(),
+      startMonth: createTask!.startDate.getMonth() + 1,
+      startDay: createTask!.startDate.getDate(),
+      endYear: createTask!.endDate.getFullYear(),
+      endMonth: createTask!.endDate.getMonth() + 1,
+      endDay: createTask!.endDate.getDate(),
+      status: createTask!.status,
+      assignee: createTask!.users
+        ? {
+            id: createTask!.users.id,
+            name: createTask!.users.name,
+            email: createTask!.users.email,
+            profileImage: createTask!.users.profileImgUrl,
+          }
+        : null,
+      tags: createTask!.taskWithTags.map((t) => ({
+        id: t.tags.id,
+        name: t.tags.tag,
+      })),
+      attachments: createTask!.files.map((f) => f.url),
+      createdAt: createTask!.createdAt,
+      updatedAt: createTask!.updatedAt,
+    };
   };
 
   taskList = async (
