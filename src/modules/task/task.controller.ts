@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { TaskService } from './task.service';
 import { TaskRepo } from './task.repo';
-import { taskIdParamSchema, updateTaskBodySchema } from './task.validator';
 
 const taskRepo = new TaskRepo();
 const taskService = new TaskService(taskRepo);
@@ -9,7 +8,7 @@ const taskService = new TaskService(taskRepo);
 export class TaskController {
   static createTask = async (req: Request, res: Response, next: NextFunction) => {
     const projectId = Number(req.params.projectId);
-    const userId = req.user.id; // authenticate 미들웨어 전제
+    const userId = req.user.id;
 
     const task = await taskService.createTask(userId, projectId, req.body);
 

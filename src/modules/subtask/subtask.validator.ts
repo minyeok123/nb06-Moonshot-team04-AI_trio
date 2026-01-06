@@ -1,7 +1,7 @@
 import z from 'zod';
 
 export const taskIdParamsSchema = z.object({
-  taskId: z.coerce.number().int().min(1),
+  taskId: z.coerce.number().int().positive(),
 });
 
 export const createSubtaskBodySchema = z.object({
@@ -9,7 +9,7 @@ export const createSubtaskBodySchema = z.object({
 });
 
 export const subtaskIdParamSchema = z.object({
-  subtaskId: z.coerce.number().int().min(1),
+  subtaskId: z.coerce.number().int().positive(),
 });
 
 export const updateSubtaskBodySchema = z.object({

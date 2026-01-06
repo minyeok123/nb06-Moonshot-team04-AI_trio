@@ -5,12 +5,15 @@ export class AuthRepo {
   findUserByEmail = async (email: string) => {
     return prisma.user.findUnique({ where: { email } });
   };
+
   create = async (option: Prisma.UserCreateArgs) => {
     return await prisma.user.create(option);
   };
+
   findOrUnique = async (option: Prisma.UserFindUniqueArgs) => {
     return await prisma.user.findUnique(option);
   };
+
   saveRefresh = async (refreshToken: string, userId: number, expiresAt: Date) => {
     return await prisma.refreshToken.upsert({
       where: { userId },
@@ -26,17 +29,17 @@ export class AuthRepo {
     });
   };
 
-  async findOAuthByEmail(email: string) {
+  findOAuthByEmail = async (email: string) => {
     return await prisma.user.findUnique({ where: { email }, include: { oauths: true } });
-  }
+  };
 
-  async updateOAuth(
+  updateOAuth = async (
     accessToken: string,
     refreshToken: string,
     exp: Date,
     sub: string,
     type: 'google' = 'google',
-  ) {
+  ) => {
     return await prisma.oauth.update({
       where: {
         provider_providerId: {
@@ -50,9 +53,9 @@ export class AuthRepo {
         expirationAt: exp,
       },
     });
-  }
+  };
 
-  async createOAuth(
+  createOAuth = async (
     email: string,
     name: string,
     picture: string,
@@ -61,7 +64,7 @@ export class AuthRepo {
     expiresAt: Date,
     sub: string,
     type: 'google' = 'google',
-  ) {
+  ) => {
     return await prisma.user.create({
       data: {
         email,
@@ -78,5 +81,5 @@ export class AuthRepo {
         },
       },
     });
-  }
+  };
 }

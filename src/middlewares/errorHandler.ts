@@ -14,13 +14,13 @@ export function globalErrorHandler(err: any, req: Request, res: Response, next: 
     if (err.code === 'P2002') {
       return res.status(409).json({
         message: '이미 존재하는 값입니다',
-        field: err.meta?.targer,
+        field: err.meta?.target,
       });
     }
     if (err.code === 'P2025') {
       return res.status(404).json({
         message: '요청한 리소스를 찾을 수 없습니다',
-        field: err.meta?.targer,
+        field: err.meta?.target,
       });
     }
   }
@@ -42,7 +42,14 @@ export function globalErrorHandler(err: any, req: Request, res: Response, next: 
     });
   }
 
-  // 4️⃣ 기타 에러 처리
+  // 4️⃣ 토큰 만료 처리
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      message: '토큰 만료',
+    });
+  }
+
+  // 5️⃣ 기타 에러 처리
   const statusCode = err.status || 500;
   return res.status(statusCode).json({
     type: 'UnknownError',

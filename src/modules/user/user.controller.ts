@@ -15,13 +15,12 @@ export class UserController {
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
     const data = { ...req.body, profileImgUrl: req.body.img ?? null };
     const userInfo = await userService.userInfoUpdate(data, req.user.id);
-    res.status(200).json({ userInfo });
+    res.status(200).json(userInfo);
   };
 
   static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
     const { page = 1, limit = 10, order, order_by } = req.query as any;
-
     const result = await userService.getMyProjectList({
       userId,
       page,

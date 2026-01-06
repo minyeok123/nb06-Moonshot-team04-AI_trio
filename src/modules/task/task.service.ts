@@ -1,6 +1,4 @@
-import { User } from '../../types/user';
 import { TaskRepo } from './task.repo';
-import bcrypt from 'bcrypt';
 import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
 import { UpdateTaskBodyDto } from './task.validator';
@@ -237,12 +235,8 @@ export class TaskService {
     const startDate = this.toDate(dto.startYear, dto.startMonth, dto.startDay);
     const endDate = this.toDate(dto.endYear, dto.endMonth, dto.endDay);
 
-    if (endDate < startDate) {
-      const err: any = new Error('endDate must be >= startDate');
-      err.status = 400;
-      throw err;
-    }
-
+    if (endDate < startDate) throw new CustomError(400, '잘못된 요청 입니다');
+    console.log(dto.assigneeId);
     await this.repo.updateTaskCore({
       taskId,
       title: dto.title,
@@ -262,11 +256,7 @@ export class TaskService {
     await this.repo.replaceTaskFiles(taskId, dto.attachments ?? []);
 
     const updated = await this.repo.getTaskForResponse(taskId);
-    if (!updated) {
-      const err: any = new Error('Task not found after update');
-      err.status = 500;
-      throw err;
-    }
+    if (!updated) throw new CustomError(400, '데이터 업데이트 실패');
 
     return this.mapResponse(updated);
   };

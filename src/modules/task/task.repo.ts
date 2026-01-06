@@ -1,6 +1,4 @@
 import { prisma } from '../../libs/prisma';
-import fs from 'fs';
-import path from 'path';
 
 type Order = 'asc' | 'desc';
 type OrderBy = 'created_at' | 'name' | 'end_date';
@@ -87,7 +85,7 @@ export class TaskRepo {
     const where = {
       projectId,
       ...(status ? { status } : {}),
-      ...(assignee ? { userId: assignee } : {}),
+      ...(assignee ? { userId: Number(assignee) } : {}),
       ...(keyword
         ? {
             OR: [
@@ -108,7 +106,7 @@ export class TaskRepo {
         where,
         orderBy,
         skip,
-        take: limit,
+        take: limitNum,
         include: {
           users: {
             select: {

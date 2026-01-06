@@ -4,7 +4,7 @@ import { CustomError } from '../../libs/error';
 import { mapStatusCount } from './utils/project.mapper';
 import { mapResponse } from './dto/project.dto';
 
-type CreateProject = Pick<Project, 'projectName' | 'description'>;
+type CreateProject = Pick<Project, 'description'> & { name: string };
 type PatchProject = Partial<CreateProject>;
 
 export class ProjectService {
@@ -12,11 +12,11 @@ export class ProjectService {
 
   // 프로젝트 생성
   createProject = async (data: CreateProject, userId: number) => {
-    const { projectName, description } = data;
+    const { name, description } = data;
 
     const project = await this.repo.createProject({
       data: {
-        projectName,
+        projectName: name,
         description,
         ownerId: userId,
         projectMembers: {
@@ -56,9 +56,9 @@ export class ProjectService {
 
   /* 프로젝트 수정 */
   patchProject = async (projectId: number, data: PatchProject) => {
-    const { projectName, description } = data;
+    const { name, description } = data;
     const project = await this.repo.patchProject({
-      data: { projectName, description },
+      data: { projectName: name, description },
       where: { id: projectId },
     });
     const groupedTask = await this.repo.taskStatusCount({
