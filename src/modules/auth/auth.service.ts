@@ -51,11 +51,14 @@ export class AuthService {
     };
     return response;
   };
+
   login = async (email: string, password: string) => {
     const getUser = await this.repo.findUserByEmail(email);
     if (!getUser) throw new CustomError(404, '존재하지 않거나 비밀번호가 일치하지 않습니다');
+
     const verifyPassword = await compareData(password, getUser.password!);
     if (!verifyPassword) throw new CustomError(404, '존재하지 않거나 비밀번호가 일치하지 않습니다');
+
     const { accessToken, refreshToken } = token.createTokens(getUser.id);
     const { id, exp } = token.verifyRefreshToken(refreshToken);
     const expiresAt = new Date(exp! * 1000);
@@ -73,7 +76,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   };
 
-  async googleLogin(state: string) {
+  googleLogin = async (state: string) => {
     const params = new URLSearchParams({
       client_id: GOOGLE_CLIENT_ID!,
       redirect_uri: GOOGLE_REDIRECT_URI!,
@@ -84,9 +87,9 @@ export class AuthService {
       prompt: 'consent',
     });
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-  }
+  };
 
-  async googleLoginByGoogleInfo(code: string) {
+  googleLoginByGoogleInfo = async (code: string) => {
     const url = 'https://oauth2.googleapis.com/token';
     const params = new URLSearchParams({
       code,
@@ -117,7 +120,9 @@ export class AuthService {
         sub,
         'google',
       );
+
       if (!updateOAuth) throw new CustomError(404, '구글 로그인 실패');
+
       const { accessToken, refreshToken } = token.createTokens(updateOAuth.userId);
       const { id, exp } = token.verifyRefreshToken(refreshToken);
       const refreshTokenExpiresAt = new Date(exp! * 1000);
@@ -125,6 +130,7 @@ export class AuthService {
       const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
       return { accessToken, refreshToken };
     }
+
     if (!existingOAuth) {
       const createUser = await this.repo.createOAuth(
         email,
@@ -136,7 +142,9 @@ export class AuthService {
         sub,
         'google',
       );
+
       if (!createUser) throw new CustomError(404, '구글 로그인 실패');
+
       const { accessToken, refreshToken } = token.createTokens(createUser.id);
       const { id, exp } = token.verifyRefreshToken(refreshToken);
       const refreshTokenExpiresAt = new Date(exp! * 1000);
@@ -144,5 +152,5 @@ export class AuthService {
       const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
       return { accessToken, refreshToken };
     }
-  }
+  };
 }

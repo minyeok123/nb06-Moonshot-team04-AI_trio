@@ -8,7 +8,7 @@ const userRepo = new UserRepo();
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader) throw new CustomError(401, '토큰 만료');
+    if (!authHeader) throw new CustomError(401, '로그인이 필요합니다');
     const isAccessToken = authHeader.split(' ')[1];
     const payload = token.verifyAccessToken(isAccessToken);
     if (!payload) throw new CustomError(401, '토큰 만료');

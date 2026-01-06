@@ -7,14 +7,14 @@ export class InvitationController {
     const { invitationId } = req.params as unknown as { invitationId: number };
     const userId = req.user.id;
     await invitationService.acceptInvitation(invitationId, userId);
-    res.sendStatus(200);
+    res.status(200).send();
   };
 
-  static cencelInvitation = async (req: Request, res: Response, next: NextFunction) => {
+  static cancelInvitation = async (req: Request, res: Response, next: NextFunction) => {
     const { invitationId } = req.params as unknown as { invitationId: number };
     const userId = req.user.id;
     await invitationService.removeInvitation(invitationId, userId);
-    res.sendStatus(204);
+    res.status(204).send();
   };
 }
 const invitationRepo = new InvitationRepo();

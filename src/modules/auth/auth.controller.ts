@@ -8,13 +8,13 @@ export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {
     const data = { ...req.body, profileImgUrl: req.body.img ?? null };
     const userWithoutPassword = await authService.register(data);
-    res.status(201).send(userWithoutPassword);
+    res.status(201).json(userWithoutPassword);
   };
 
   static login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const { accessToken, refreshToken } = await authService.login(email, password);
-    res.status(200).json({ message: 'login Ok!', accessToken, refreshToken });
+    res.status(200).json({ accessToken, refreshToken });
   };
 
   static refresh = async (req: Request, res: Response, next: NextFunction) => {
@@ -23,14 +23,14 @@ export class AuthController {
     res.status(200).json(token);
   };
 
-  static async googleLogin(req: Request, res: Response) {
+  static googleLogin = async (req: Request, res: Response) => {
     const createState = generateState(16);
     req.session.oauthState = createState;
     const googleRedirectUrl = await authService.googleLogin(createState);
     res.status(302).redirect(googleRedirectUrl);
-  }
+  };
 
-  static async googleCallback(req: Request, res: Response) {
+  static googleCallback = async (req: Request, res: Response) => {
     const { code } = req.query;
     const { accessToken, refreshToken } = (await authService.googleLoginByGoogleInfo(
       String(code),
@@ -51,7 +51,7 @@ export class AuthController {
     });
 
     res.status(302).redirect(FRONTEND_URL!);
-  }
+  };
 }
 
 const authRepo = new AuthRepo();

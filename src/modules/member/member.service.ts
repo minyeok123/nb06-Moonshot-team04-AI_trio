@@ -9,17 +9,15 @@ export class MemberService {
     if (!member) throw new CustomError(403, '프로젝트 멤버가 아닙니다');
 
     const skip = (page - 1) * limit;
-
     const { members, total } = await this.repo.findMembersByProjectId(projectId, skip, limit);
-
     const formatted = members.map((m) => ({
       id: m.users.id,
       name: m.users.name,
       email: m.users.email,
       profileImage: m.users.profileImgUrl,
       taskCount: m.users._count.tasks,
-      status: m.projectInvitation?.invitationStatus ?? null,
-      invitationId: m.invitationId ?? null,
+      status: m.projectInvitation?.invitationStatus,
+      invitationId: m.invitationId,
     }));
 
     return {
@@ -41,7 +39,6 @@ export class MemberService {
     if (!user) throw new CustomError(404, '사용자를 찾을 수 없습니다');
 
     const receiveUserId = user.id;
-
     const existingMember = await this.repo.findProjectMember(projectId, receiveUserId);
     if (existingMember) throw new CustomError(400, '이미 프로젝트 멤버입니다');
 
@@ -49,9 +46,7 @@ export class MemberService {
     if (existingInvitation) throw new CustomError(400, '이미 초대된 사용자입니다');
 
     const invitation = await this.repo.createInvitation(sendUserId, receiveUserId, projectId);
-
     console.log(`초대 코드: ${invitation.id}`);
-
     return { invitationId: invitation.id.toString() };
   };
 }

@@ -26,7 +26,6 @@ class Token {
 
   verifyAccessToken = (token: string) => {
     const decodedUser = jwt.verify(token, JWT_SECRET!) as tokenPayloadUserid;
-
     return { userId: decodedUser.id };
   };
 

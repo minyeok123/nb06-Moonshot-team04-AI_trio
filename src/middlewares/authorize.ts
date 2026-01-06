@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { MemberRepo } from '../modules/member/member.repo';
 import { prisma } from '../libs/prisma';
 import { CustomError } from '../libs/error';
-import { unknown } from 'zod';
 
 export class Authorize {
   static projectOwner = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +32,7 @@ export class Authorize {
         where: { userId_projectId: { userId, projectId } },
       });
       if (!existingOwner) {
-        throw new CustomError(404, '');
+        throw new CustomError(403, '프로젝트 멤버가 아닙니다');
       }
       if (existingOwner.role !== 'owner') {
         throw new CustomError(403, '프로젝트 관리자가 아닙니다.');

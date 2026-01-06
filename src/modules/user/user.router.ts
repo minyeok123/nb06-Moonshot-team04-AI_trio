@@ -19,8 +19,9 @@ router.patch(
   validate(userPasswordValidator, 'body'),
   asyncHandler(UserController.userInfoChange),
 );
+
 router.get(
-  '/me/tasks',
+  '/me/projects',
   tokenValidate(),
   authenticate,
   validate(getMyProjectValidator, 'query'),
@@ -28,23 +29,7 @@ router.get(
 );
 
 router.get(
-  '/me/projects',
-  tokenValidate(),
-  authenticate,
-  validate(getMyTaskValidator, 'query'),
-  asyncHandler(UserController.getMyTasks),
-);
-
-router.get(
   '/me/tasks',
-  tokenValidate(),
-  authenticate,
-  validate(getMyProjectValidator, 'query'),
-  asyncHandler(UserController.getMyProjects),
-);
-
-router.get(
-  '/me/projects',
   tokenValidate(),
   authenticate,
   validate(getMyTaskValidator, 'query'),

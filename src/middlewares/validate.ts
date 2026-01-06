@@ -25,11 +25,12 @@ export function tokenValidate() {
         authorization: z.string().startsWith('Bearer '),
       });
       const authHeader = req.headers.authorization;
-      const _ = tokenSchema.parse({ authorization: authHeader });
-
+      if (!authHeader) throw new CustomError(401, '로그인이 필요합니다');
+      const validatedToken = tokenSchema.parse({ authorization: authHeader });
+      if (!validatedToken) throw new CustomError(400, '잘못된 토큰 형식');
       next();
-    } catch {
-      next(new CustomError(400, '잘못된 토큰 형식'));
+    } catch (e) {
+      next(e);
     }
   };
 }
