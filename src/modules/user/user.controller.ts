@@ -20,7 +20,7 @@ export class UserController {
 
   static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
-    const { page = 1, limit = 10, order, order_by } = req.query as any;
+    const { page, limit, order, order_by } = req.validatedQuery as any;
     const result = await userService.getMyProjectList({
       userId,
       page,
@@ -34,7 +34,7 @@ export class UserController {
 
   static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
-    const tasks = await userService.getMyTaskList(userId, req.query);
+    const tasks = await userService.getMyTaskList(userId, req.validatedQuery);
     res.status(200).json(tasks);
   };
 }

@@ -15,6 +15,13 @@ export const CommentIdParamsSchema = z.object({
 });
 
 export const CommentQuerySchema = z.object({
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().positive().optional(),
+  page: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().positive().default(1),
+  ),
+
+  limit: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().positive().max(10).default(10),
+  ),
 });

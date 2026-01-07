@@ -5,7 +5,7 @@ import { MemberService } from './member.service';
 export class MemberController {
   static getMembers = async (req: Request, res: Response, next: NextFunction) => {
     const { projectId } = req.params as unknown as { projectId: number };
-    const { page = 1, limit = 10 } = req.query as unknown as { page: number; limit: number };
+    const { page, limit } = req.validatedQuery as unknown as { page: number; limit: number };
     const userId = req.user.id;
     const members = await memberService.getMembers(Number(page), Number(limit), projectId, userId);
     res.status(200).json(members);

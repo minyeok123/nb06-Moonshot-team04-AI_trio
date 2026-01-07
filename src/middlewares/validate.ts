@@ -6,7 +6,11 @@ export function validate(schema: ZodType, source: 'body' | 'params' | 'query' = 
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse(req[source]);
-      Object.assign(req[source], parsed);
+      if (source === 'query') {
+        req.validatedQuery = parsed;
+      } else {
+        Object.assign(req[source], parsed);
+      }
       next();
     } catch (err) {
       next(err);
@@ -22,7 +26,7 @@ export function tokenValidate() {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const tokenSchema = z.object({
-        authorization: z.string().startsWith('Bearer '),
+        authorization: z.string().startsWith('Bearer'),
       });
       const authHeader = req.headers.authorization;
       if (!authHeader) throw new CustomError(401, '로그인이 필요합니다');

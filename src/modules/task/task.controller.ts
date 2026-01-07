@@ -18,7 +18,7 @@ export class TaskController {
   static taskList = async (req: Request, res: Response, next: NextFunction) => {
     const projectId = Number(req.params.projectId);
 
-    const data = req.query as any;
+    const data = req.validatedQuery as any;
 
     const result = await taskService.taskList(projectId, data);
 
