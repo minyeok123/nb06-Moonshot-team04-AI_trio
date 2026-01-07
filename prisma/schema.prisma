@@ -85,6 +85,7 @@ model Task {
   userId       Int            @map("user_id")
   projectId    Int            @map("project_id")
   title        String
+  description  String?
   status       TaskStatus     @default(todo)
   startDate    DateTime       @map("start_date")
   endDate      DateTime       @map("end_date")

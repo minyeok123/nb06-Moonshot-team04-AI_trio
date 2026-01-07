@@ -51,7 +51,6 @@ router.patch(
   Authorize.taskOrSubtaskProjectMember,
   upload.array('attachments'),
   attachFilePath,
-  validate(taskIdParamSchema, 'params'),
   validate(updateTaskBodySchema, 'body'),
   asyncHandler(TaskController.updateTask),
 );

@@ -26,8 +26,10 @@ export class TaskRepo {
           create: { tag },
         });
 
-        await tx.taskWithTags.create({
-          data: {
+        await tx.taskWithTags.upsert({
+          where: { tagId_taskId: { taskId, tagId: tagInfo.id } },
+          update: {},
+          create: {
             taskId,
             tagId: tagInfo.id,
           },
@@ -125,8 +127,6 @@ export class TaskRepo {
   };
 
   toOrderBy = (order_by: OrderBy, order: Order) => {
-    // order_by 명세: created_at, name, end_date
-    // name은 task.title로 해석 (응답에도 title만 있음)
     switch (order_by) {
       case 'created_at':
         return { createdAt: order };
@@ -170,56 +170,36 @@ export class TaskRepo {
     });
   };
 
-  updateTaskCore = async (args: {
+  updateTaskCore = async (data: {
     taskId: number;
     title: string;
+    description: string | null;
     status: 'todo' | 'in_progress' | 'done';
     startDate: Date;
     endDate: Date;
     assigneeId: number; // Task.userId로 매핑
   }) => {
     return prisma.task.update({
-      where: { id: args.taskId },
+      where: { id: data.taskId },
       data: {
-        title: args.title,
-        status: args.status,
-        startDate: args.startDate,
-        endDate: args.endDate,
-        userId: args.assigneeId,
+        title: data.title,
+        description: data.description,
+        status: data.status,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        userId: data.assigneeId,
       },
-    });
-  };
-
-  replaceTaskTags = async (taskId: number, tagIds: number[]) => {
-    await prisma.taskWithTags.deleteMany({ where: { taskId } });
-
-    if (tagIds.length === 0) return;
-
-    await prisma.taskWithTags.createMany({
-      data: tagIds.map((tagId) => ({ taskId, tagId })),
-      skipDuplicates: true,
     });
   };
 
   replaceTaskFiles = async (taskId: number, urls: string[]) => {
-    await prisma.file.deleteMany({ where: { taskId } });
-
-    const unique = [...new Set(urls.map((u) => u.trim()).filter(Boolean))];
-    if (unique.length === 0) return;
-
-    await prisma.file.createMany({
-      data: unique.map((url) => ({ taskId, url })),
-    });
-  };
-
-  getTaskForResponse = (taskId: number) => {
-    return prisma.task.findUnique({
-      where: { id: taskId },
-      include: {
-        users: true,
-        taskWithTags: { include: { tags: true } },
-        files: true,
-      },
+    return prisma.$transaction(async (taskUpdate) => {
+      await taskUpdate.file.deleteMany({ where: { taskId } });
+      const unique = [...new Set(urls.map((u) => u.trim()).filter(Boolean))];
+      if (unique.length === 0) return;
+      await taskUpdate.file.createMany({
+        data: unique.map((url) => ({ taskId, url })),
+      });
     });
   };
 

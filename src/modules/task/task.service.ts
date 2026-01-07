@@ -5,6 +5,7 @@ import { BASE_URL } from '../../libs/constants';
 
 type updateTaskBody = {
   title: string;
+  description: string | null;
   startYear: number;
   startMonth: number;
   startDay: number;
@@ -21,6 +22,7 @@ type UpdateTaskResult = {
   id: number;
   projectId: number;
   title: string;
+  description: string | null;
   startYear: number;
   startMonth: number;
   startDay: number;
@@ -38,10 +40,12 @@ type UpdateTaskResult = {
 export class TaskService {
   constructor(private repo: TaskRepo) {}
 
+  // 태그 리팩토링 작업
   normalizeTags(tagNames: string[]) {
     return [...new Set(tagNames.map((t) => t.trim()).filter(Boolean))];
   }
 
+  // 최종 전달 response 맵핑 작업
   mapResponse = (task: any): UpdateTaskResult => {
     const start = task.startDate as Date;
     const end = task.endDate as Date;
@@ -51,6 +55,7 @@ export class TaskService {
       id: task.id,
       projectId: task.projectId,
       title: task.title,
+      description: task.description ?? '',
       startYear: start.getFullYear(),
       startMonth: start.getMonth() + 1,
       startDay: start.getDate(),
@@ -76,6 +81,7 @@ export class TaskService {
     };
   };
 
+  // 프로젝트에 할 일 생성
   createTask = async (userId: number, projectId: number, data: updateTaskBody) => {
     const startDate = new Date(data.startYear, data.startMonth - 1, data.startDay);
     const endDate = new Date(data.endYear, data.endMonth - 1, data.endDay);
@@ -107,7 +113,8 @@ export class TaskService {
     return this.mapResponse(createTask);
   };
 
-  taskList = async (
+  // 프로젝트의 할 일 목록 조회
+  getTaskList = async (
     projectId: number,
     query: {
       page: number;
@@ -130,6 +137,7 @@ export class TaskService {
     };
   };
 
+  // 할 일 상세 조회
   getTaskById = async (taskId: number) => {
     const task = await this.repo.findTaskInfoById(taskId);
 
@@ -140,36 +148,39 @@ export class TaskService {
     return this.mapResponse(task);
   };
 
+  // 할 일 수정
   updateTask = async (taskId: number, data: updateTaskBody) => {
     const startDate = new Date(data.startYear, data.startMonth - 1, data.startDay);
     const endDate = new Date(data.endYear, data.endMonth - 1, data.endDay);
 
     if (endDate < startDate) throw new CustomError(400, '잘못된 요청 입니다');
 
-    const updataTask = await this.repo.updateTaskCore({
+    // 1. task 기본 정보 수정
+    await this.repo.updateTaskCore({
       taskId,
       title: data.title,
+      description: data.description ?? '',
       status: data.status as TaskStatus,
       startDate,
       endDate,
       assigneeId: data.assigneeId,
     });
 
+    // 2. task에 연동 된 tag 수정
     const normalizedTags = this.normalizeTags(data.tags);
-    const tags = await this.repo.upsertTags(normalizedTags, taskId);
+    await this.repo.upsertTags(normalizedTags, taskId);
 
-    // await this.repo.replaceTaskTags(
-    //   taskId,
-    //   tags.map((t) => t.id),
-    // );
+    // 3. task에 연동 된 file 수정
     await this.repo.replaceTaskFiles(taskId, data.attachments ?? []);
 
-    const updated = await this.repo.getTaskForResponse(taskId);
-    if (!updated) throw new CustomError(400, '데이터 업데이트 실패');
+    // 모든 작업이 마친 뒤 업데이트 된 정보 불러오기
+    const updated = await this.repo.findTaskWithRelations(taskId);
+    if (!updated) throw new CustomError(400, '데이터가 존재하지 않습니다');
 
     return this.mapResponse(updated);
   };
 
+  // 할 일 삭제
   deleteTask = async (taskId: number) => {
     return this.repo.deleteTaskById(taskId);
   };

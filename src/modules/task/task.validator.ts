@@ -63,6 +63,7 @@ export const taskIdParamSchema = z.object({
 
 export const updateTaskBodySchema = z.object({
   title: z.string().min(1).max(200),
+  description: z.string().min(1).max(300).default(''),
   startYear: z.coerce.number().positive().int().min(2026).max(3000),
   startMonth: z.coerce.number().positive().int().min(1).max(12),
   startDay: z.coerce.number().positive().int().min(1).max(31),
@@ -75,5 +76,5 @@ export const updateTaskBodySchema = z.object({
   assigneeId: z.coerce.number().int().positive(),
 
   tags: tagsSchema,
-  attachments: z.array(z.string().url()).default([]),
+  attachments: z.array(z.string()).default([]),
 });
