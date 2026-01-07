@@ -20,7 +20,7 @@ router.post(
   tokenValidate(),
   authenticate,
   Authorize.projectMember,
-  upload.single('attachments'),
+  upload.array('attachments'),
   attachFilePath,
   validate(taskValidator, 'body'),
   asyncHandler(TaskController.createTask),
@@ -49,7 +49,8 @@ router.patch(
   tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
-  validate(taskIdParamSchema, 'params'),
+  upload.array('attachments'),
+  attachFilePath,
   validate(updateTaskBodySchema, 'body'),
   asyncHandler(TaskController.updateTask),
 );

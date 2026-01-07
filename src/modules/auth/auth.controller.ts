@@ -6,7 +6,7 @@ import { FRONTEND_URL } from '../../libs/constants';
 
 export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.body.img ?? null };
+    const data = { ...req.body, profileImgUrl: req.body.file ?? null };
     const userWithoutPassword = await authService.register(data);
     res.status(201).json(userWithoutPassword);
   };

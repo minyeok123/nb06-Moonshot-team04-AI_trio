@@ -2,6 +2,7 @@ import { User } from '../../types/user';
 import { UserRepo } from './user.repo';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../../libs/error';
+import { BASE_URL } from '../../libs/constants';
 
 type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
   currentPassword: string;
@@ -12,47 +13,76 @@ type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
 export class UserService {
   constructor(private repo: UserRepo) {}
 
-  userInfoUpdate = async (data: UserInfo, userId: number) => {
-    // 이미지 업로드 준비
-    const profileImgUrl = data.profileImgUrl ?? null;
-
-    // 유저 정보 불러와 데이터 사용
+  getUserInfo = async (userId: number) => {
     const user: User = await this.repo.findUserById(userId);
     if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
 
-    // 기존 비밀번호, 신규 비밀번호, 신규 비밀번호 확인 불러오기
-    const oldPassword = data.currentPassword;
-    const newPassword = data.newPassword;
-    const checkNewPassword = data.checkNewPassword;
+    const baseUrl = BASE_URL;
 
-    let userUpdate;
+    const { password: _, ...userWithoutPW } = user;
 
-    // 비밀번호가 있는 경우 해당 내용 함께 업데이트 적용
-    if (oldPassword && newPassword && checkNewPassword) {
-      // 신규 입력 비밀번호 확인
-      if (newPassword !== checkNewPassword)
-        throw new CustomError(401, '신규 비밀번호와 신규확인 비밀번호가 다릅니다');
-
-      // 사용자가 입력 한 데이터와 서버 데이터가 동일한지 확인
-      const isMatch = await bcrypt.compare(oldPassword, user.password!);
-      if (!isMatch) throw new CustomError(401, '기존 비밀번호와 일치하지 않습니다');
-
-      // 비밀번호 DB에 업데이트 전 해싱 작업 진행
-      const salt = await bcrypt.genSalt(10);
-      const hashedNewPassword = await bcrypt.hash(newPassword, salt);
-
-      // 비밀번호 업데이트 이후, 나머지 정보만 제공
-      userUpdate = await this.repo.updateUserInfoAll(userId, profileImgUrl, hashedNewPassword);
-    } else {
-      // 비밀번호가 없는 경우 이미지만 업데이트
-      userUpdate = await this.repo.updateUserInfoImg(userId, profileImgUrl);
-    }
-
-    const { password: _, ...userInfo } = userUpdate;
+    const userInfo = {
+      ...userWithoutPW,
+      profileImgUrl: userWithoutPW.profileImgUrl
+        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
+        : null,
+    };
 
     return userInfo;
   };
 
+  // 내 정보 수정
+  userInfoUpdate = async (data: UserInfo, userId: number) => {
+    const user: User = await this.repo.findUserById(userId);
+    if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
+
+    // 기존 비밀번호 확인
+    const oldPassword = data.currentPassword;
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password!);
+    if (!isMatch) throw new CustomError(400, '기존 비밀번호 확인이 필요합니다');
+
+    // 비밀번호가 있는 경우 비밀번호 업데이트
+    const newPassword = data.newPassword;
+    const checkNewPassword = data.checkNewPassword;
+
+    if (oldPassword && newPassword && checkNewPassword) {
+      if (oldPassword === newPassword)
+        throw new CustomError(400, '기존 비밀번호와 신규 비밀번호가 같습니다');
+
+      if (newPassword !== checkNewPassword)
+        throw new CustomError(400, '신규 비밀번호와 신규확인 비밀번호가 다릅니다');
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+      await this.repo.updateUserPassword(userId, hashedNewPassword);
+    }
+
+    // 이미지가 있는 경우 이미지 업데이트
+    const profileImgUrl = data.profileImgUrl ?? null;
+
+    if (profileImgUrl) {
+      await this.repo.updateUserImg(userId, profileImgUrl);
+    }
+
+    const userUpdate = await this.repo.findUserById(userId);
+
+    const baseUrl = BASE_URL;
+
+    const { password: _, ...userWithoutPW } = userUpdate;
+
+    const userInfo = {
+      ...userWithoutPW,
+      profileImgUrl: userWithoutPW.profileImgUrl
+        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
+        : null,
+    };
+
+    return userInfo;
+  };
+
+  // 참여 중인 프로젝트 조회
   getMyProjectList = async ({
     userId,
     page,
@@ -71,15 +101,12 @@ export class UserService {
 
     const orderBy = orderByKey === 'created_at' ? { createdAt: order } : { projectName: order };
 
-    const [projects, total] = await Promise.all([
-      this.repo.findUserProjects({
-        userId,
-        skip,
-        take: limitNum,
-        orderBy,
-      }),
-      this.repo.countUserProjects(userId),
-    ]);
+    const projects = await this.repo.findUserProjects({
+      userId,
+      skip,
+      take: limitNum,
+      orderBy,
+    });
 
     const data = projects.map((project) => {
       const todoCount = project.tasks.filter((t) => t.status === 'todo').length;
@@ -99,9 +126,12 @@ export class UserService {
       };
     });
 
+    const total = data.length;
+
     return { data, total };
   };
 
+  // 참여 중인 모든 프로젝트의 할 일 목록 조회
   getMyTaskList = async (userId: number, query: any) => {
     const tasks = await this.repo.findMyTasks(userId, query);
 

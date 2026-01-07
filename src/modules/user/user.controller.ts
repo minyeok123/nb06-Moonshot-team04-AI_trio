@@ -7,13 +7,12 @@ const userService = new UserService(userRepo);
 
 export class UserController {
   static userInfo = async (req: Request, res: Response, next: NextFunction) => {
-    const checkUser = req.user;
-
-    res.status(200).json(checkUser);
+    const userInfo = await userService.getUserInfo(req.user.id);
+    res.status(200).json(userInfo);
   };
 
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.body.img ?? null };
+    const data = { ...req.body, profileImgUrl: req.body.file ?? null };
     const userInfo = await userService.userInfoUpdate(data, req.user.id);
     res.status(200).json(userInfo);
   };
@@ -21,7 +20,7 @@ export class UserController {
   static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
     const { page, limit, order, order_by } = req.validatedQuery as any;
-    const result = await userService.getMyProjectList({
+    const projectList = await userService.getMyProjectList({
       userId,
       page,
       limit,
@@ -29,7 +28,7 @@ export class UserController {
       orderByKey: order_by,
     });
 
-    res.status(200).json(result);
+    res.status(200).json(projectList);
   };
 
   static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {

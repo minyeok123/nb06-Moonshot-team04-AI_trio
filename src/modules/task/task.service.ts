@@ -1,12 +1,28 @@
 import { TaskRepo } from './task.repo';
 import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
-import { UpdateTaskBodyDto } from './task.validator';
+import { BASE_URL } from '../../libs/constants';
+
+type updateTaskBody = {
+  title: string;
+  description: string | null;
+  startYear: number;
+  startMonth: number;
+  startDay: number;
+  endYear: number;
+  endMonth: number;
+  endDay: number;
+  status: 'todo' | 'in_progress' | 'done';
+  assigneeId: number;
+  tags: string[];
+  attachments: string[];
+};
 
 type UpdateTaskResult = {
   id: number;
   projectId: number;
   title: string;
+  description: string | null;
   startYear: number;
   startMonth: number;
   startDay: number;
@@ -24,188 +40,22 @@ type UpdateTaskResult = {
 export class TaskService {
   constructor(private repo: TaskRepo) {}
 
+  // 태그 리팩토링 작업
   normalizeTags(tagNames: string[]) {
     return [...new Set(tagNames.map((t) => t.trim()).filter(Boolean))];
   }
 
-  createTask = async (
-    userId: number,
-    projectId: number,
-    dto: {
-      title: string;
-      description: string | '';
-      startYear: number;
-      startMonth: number;
-      startDay: number;
-      endYear: number;
-      endMonth: number;
-      endDay: number;
-      status: 'todo' | 'in_progress' | 'done';
-      tags: string[];
-      attachments: string[];
-    },
-  ) => {
-    const startDate = new Date(dto.startYear, dto.startMonth - 1, dto.startDay);
-    const endDate = new Date(dto.endYear, dto.endMonth - 1, dto.endDay);
-
-    const task = await this.repo.createTask({
-      userId,
-      projectId,
-      title: dto.title,
-      description: dto.description,
-      status: dto.status,
-      startDate,
-      endDate,
-    });
-
-    if (dto.tags.length > 0) {
-      const normalizedTags = this.normalizeTags(dto.tags);
-      await this.repo.upsertTags(normalizedTags);
-    }
-
-    if (dto.attachments.length > 0) {
-      await this.repo.createFiles(task.id, dto.attachments);
-    }
-
-    const createTask = await this.repo.findTaskWithRelations(task.id);
-
-    return {
-      id: createTask!.id,
-      projectId: createTask!.projectId,
-      title: createTask!.title,
-      startYear: createTask!.startDate.getFullYear(),
-      startMonth: createTask!.startDate.getMonth() + 1,
-      startDay: createTask!.startDate.getDate(),
-      endYear: createTask!.endDate.getFullYear(),
-      endMonth: createTask!.endDate.getMonth() + 1,
-      endDay: createTask!.endDate.getDate(),
-      status: createTask!.status,
-      assignee: createTask!.users
-        ? {
-            id: createTask!.users.id,
-            name: createTask!.users.name,
-            email: createTask!.users.email,
-            profileImage: createTask!.users.profileImgUrl,
-          }
-        : null,
-      tags: createTask!.taskWithTags.map((t) => ({
-        id: t.tags.id,
-        name: t.tags.tag,
-      })),
-      attachments: createTask!.files.map((f) => f.url),
-      createdAt: createTask!.createdAt,
-      updatedAt: createTask!.updatedAt,
-    };
-  };
-
-  taskList = async (
-    projectId: number,
-    query: {
-      page: number;
-      limit: number;
-      status?: 'todo' | 'in_progress' | 'done';
-      assignee?: number;
-      keyword?: string;
-      order: 'asc' | 'desc';
-      order_by: 'created_at' | 'name' | 'end_date';
-    },
-  ) => {
-    const { data, total } = await this.repo.findManyWithTotal({
-      projectId,
-      ...query,
-    });
-
-    return {
-      data: data.map((task) => ({
-        id: task.id,
-        projectId: task.projectId,
-        title: task.title,
-        startYear: task.startDate.getFullYear(),
-        startMonth: task.startDate.getMonth() + 1,
-        startDay: task.startDate.getDate(),
-        endYear: task.endDate.getFullYear(),
-        endMonth: task.endDate.getMonth() + 1,
-        endDay: task.endDate.getDate(),
-        status: task.status,
-        assignee: task.users
-          ? {
-              id: task.users.id,
-              name: task.users.name,
-              email: task.users.email,
-              profileImage: task.users.profileImgUrl,
-            }
-          : null,
-        tags: task.taskWithTags.map((t) => ({
-          id: t.tags.id,
-          name: t.tags.tag,
-        })),
-        attachments: task.files.map((f) => f.url),
-        createdAt: task.createdAt,
-        updatedAt: task.updatedAt,
-      })),
-      total,
-    };
-  };
-
-  getTaskById = async (taskId: number) => {
-    const task = await this.repo.findTaskInfoById(taskId);
-
-    if (!task) {
-      throw new CustomError(404, '존재하지 않는 Task 입니다.');
-    }
-
-    const start = task.startDate;
-    const end = task.endDate;
-
-    return {
-      id: task.id,
-      projectId: task.projectId,
-      title: task.title,
-
-      startYear: start.getFullYear(),
-      startMonth: start.getMonth() + 1,
-      startDay: start.getDate(),
-
-      endYear: end.getFullYear(),
-      endMonth: end.getMonth() + 1,
-      endDay: end.getDate(),
-
-      status: task.status,
-
-      assignee: task.users
-        ? {
-            id: task.users.id,
-            name: task.users.name,
-            email: task.users.email,
-            profileImage: task.users.profileImgUrl,
-          }
-        : null,
-
-      tags: task.taskWithTags.map((t) => ({
-        id: t.tags.id,
-        name: t.tags.tag,
-      })),
-
-      attachments: task.files.map((f) => f.url),
-
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-    };
-  };
-
-  toDate = (y: number, m: number, d: number) => {
-    // JS Date month는 0-based
-    return new Date(y, m - 1, d, 0, 0, 0, 0);
-  };
-
+  // 최종 전달 response 맵핑 작업
   mapResponse = (task: any): UpdateTaskResult => {
     const start = task.startDate as Date;
     const end = task.endDate as Date;
+    const baseUrl = BASE_URL;
 
     return {
       id: task.id,
       projectId: task.projectId,
       title: task.title,
+      description: task.description ?? '',
       startYear: start.getFullYear(),
       startMonth: start.getMonth() + 1,
       startDay: start.getDate(),
@@ -225,42 +75,112 @@ export class TaskService {
         id: twt.tags.id,
         name: twt.tags.tag,
       })),
-      attachments: (task.files ?? []).map((f: any) => f.url),
+      attachments: task!.files.map((f: any) => `${baseUrl}${f.url}`),
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
   };
 
-  updateTask = async (taskId: number, dto: UpdateTaskBodyDto, requesterId: number) => {
-    const startDate = this.toDate(dto.startYear, dto.startMonth, dto.startDay);
-    const endDate = this.toDate(dto.endYear, dto.endMonth, dto.endDay);
+  // 프로젝트에 할 일 생성
+  createTask = async (userId: number, projectId: number, data: updateTaskBody) => {
+    const startDate = new Date(data.startYear, data.startMonth - 1, data.startDay);
+    const endDate = new Date(data.endYear, data.endMonth - 1, data.endDay);
 
     if (endDate < startDate) throw new CustomError(400, '잘못된 요청 입니다');
-    console.log(dto.assigneeId);
-    await this.repo.updateTaskCore({
-      taskId,
-      title: dto.title,
-      status: dto.status as TaskStatus,
+
+    const task = await this.repo.createTask({
+      userId,
+      projectId,
+      title: data.title,
+      status: data.status,
       startDate,
       endDate,
-      assigneeId: dto.assigneeId,
     });
 
-    const normalizedTags = this.normalizeTags(dto.tags);
-    const tags = await this.repo.upsertTags(normalizedTags);
+    const taskId = task.id;
 
-    await this.repo.replaceTaskTags(
+    if (data.tags.length > 0) {
+      const normalizedTags = this.normalizeTags(data.tags);
+      await this.repo.upsertTags(normalizedTags, taskId);
+    }
+
+    if (data.attachments.length > 0) {
+      await this.repo.createFiles(task.id, data.attachments);
+    }
+
+    const createTask = await this.repo.findTaskWithRelations(task.id);
+
+    return this.mapResponse(createTask);
+  };
+
+  // 프로젝트의 할 일 목록 조회
+  getTaskList = async (
+    projectId: number,
+    query: {
+      page: number;
+      limit: number;
+      status?: 'todo' | 'in_progress' | 'done';
+      assignee?: number;
+      keyword?: string;
+      order: 'asc' | 'desc';
+      order_by: 'created_at' | 'name' | 'end_date';
+    },
+  ) => {
+    const { data, total } = await this.repo.findManyWithTotal({
+      projectId,
+      ...query,
+    });
+
+    return {
+      data: data.map((task: any) => this.mapResponse(task)),
+      total,
+    };
+  };
+
+  // 할 일 상세 조회
+  getTaskById = async (taskId: number) => {
+    const task = await this.repo.findTaskInfoById(taskId);
+
+    if (!task) {
+      throw new CustomError(404, '존재하지 않는 Task 입니다.');
+    }
+
+    return this.mapResponse(task);
+  };
+
+  // 할 일 수정
+  updateTask = async (taskId: number, data: updateTaskBody) => {
+    const startDate = new Date(data.startYear, data.startMonth - 1, data.startDay);
+    const endDate = new Date(data.endYear, data.endMonth - 1, data.endDay);
+
+    if (endDate < startDate) throw new CustomError(400, '잘못된 요청 입니다');
+
+    // 1. task 기본 정보 수정
+    await this.repo.updateTaskCore({
       taskId,
-      tags.map((t) => t.id),
-    );
-    await this.repo.replaceTaskFiles(taskId, dto.attachments ?? []);
+      title: data.title,
+      description: data.description ?? '',
+      status: data.status as TaskStatus,
+      startDate,
+      endDate,
+      assigneeId: data.assigneeId,
+    });
 
-    const updated = await this.repo.getTaskForResponse(taskId);
-    if (!updated) throw new CustomError(400, '데이터 업데이트 실패');
+    // 2. task에 연동 된 tag 수정
+    const normalizedTags = this.normalizeTags(data.tags);
+    await this.repo.upsertTags(normalizedTags, taskId);
+
+    // 3. task에 연동 된 file 수정
+    await this.repo.replaceTaskFiles(taskId, data.attachments ?? []);
+
+    // 모든 작업이 마친 뒤 업데이트 된 정보 불러오기
+    const updated = await this.repo.findTaskWithRelations(taskId);
+    if (!updated) throw new CustomError(400, '데이터가 존재하지 않습니다');
 
     return this.mapResponse(updated);
   };
 
+  // 할 일 삭제
   deleteTask = async (taskId: number) => {
     return this.repo.deleteTaskById(taskId);
   };

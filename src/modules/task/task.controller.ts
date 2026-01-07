@@ -6,6 +6,7 @@ const taskRepo = new TaskRepo();
 const taskService = new TaskService(taskRepo);
 
 export class TaskController {
+  // 할 일 생성
   static createTask = async (req: Request, res: Response, next: NextFunction) => {
     const projectId = Number(req.params.projectId);
     const userId = req.user.id;
@@ -15,16 +16,18 @@ export class TaskController {
     res.status(200).json(task);
   };
 
+  // 프로젝트의 할 일 목록 조회
   static taskList = async (req: Request, res: Response, next: NextFunction) => {
     const projectId = Number(req.params.projectId);
 
     const data = req.validatedQuery as any;
 
-    const result = await taskService.taskList(projectId, data);
+    const task = await taskService.getTaskList(projectId, data);
 
-    res.status(200).json(result);
+    res.status(200).json(task);
   };
 
+  // 할 일 상세 조회
   static getTaskById = async (req: Request, res: Response, next: NextFunction) => {
     const taskId = Number(req.params.taskId);
 
@@ -33,15 +36,16 @@ export class TaskController {
     res.status(200).json(task);
   };
 
+  // 할 일 수정
   static updateTask = async (req: Request, res: Response, next: NextFunction) => {
     const taskId = Number(req.params.taskId);
     const body = req.body;
-    const userId = req.user.id;
 
-    const result = await taskService.updateTask(taskId, body, userId);
-    return res.status(200).json(result);
+    const task = await taskService.updateTask(taskId, body);
+    return res.status(200).json(task);
   };
 
+  // 할 일 삭제
   static deleteTask = async (req: Request, res: Response, next: NextFunction) => {
     const taskId = Number(req.params.taskId);
 
