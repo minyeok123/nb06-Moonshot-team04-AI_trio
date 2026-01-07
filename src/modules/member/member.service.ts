@@ -8,21 +8,34 @@ export class MemberService {
     const member = await this.repo.findProjectMember(projectId, userId);
     if (!member) throw new CustomError(403, '프로젝트 멤버가 아닙니다');
 
+    const owner = await this.repo.findProjectOwnerInfo(projectId);
+    const formattedOwner = {
+      id: owner!.users.id,
+      name: owner!.users.name,
+      email: owner!.users.email,
+      profileImage: owner!.users.profileImgUrl,
+      taskCount: owner!.users._count.tasks,
+      status: null,
+      invitationId: null,
+    };
     const skip = (page - 1) * limit;
-    const { members, total } = await this.repo.findMembersByProjectId(projectId, skip, limit);
-    const formatted = members.map((m) => ({
+    const members = await this.repo.findMembersByProjectId(projectId, skip, limit);
+    const acceptedMembers = members.filter(
+      (m) => m.invitationStatus !== 'rejected' && m.projectMember?.memberStatus !== 'rejected',
+    );
+    const total = members.filter((m) => m.projectMember?.memberStatus === 'accepted');
+    const formatted = acceptedMembers.map((m) => ({
       id: m.users.id,
       name: m.users.name,
       email: m.users.email,
       profileImage: m.users.profileImgUrl,
       taskCount: m.users._count.tasks,
-      status: m.projectInvitation?.invitationStatus,
-      invitationId: m.invitationId,
+      status: m.invitationStatus,
+      invitationId: m.id,
     }));
-
     return {
-      data: formatted,
-      total,
+      data: [formattedOwner, ...formatted],
+      total: total.length + 1,
     };
   };
 
@@ -40,13 +53,21 @@ export class MemberService {
 
     const receiveUserId = user.id;
     const existingMember = await this.repo.findProjectMember(projectId, receiveUserId);
-    if (existingMember) throw new CustomError(400, '이미 프로젝트 멤버입니다');
+    if (existingMember && existingMember.memberStatus === 'accepted')
+      throw new CustomError(400, '이미 프로젝트 멤버입니다');
 
-    const existingInvitation = await this.repo.findInvitation(projectId, receiveUserId);
-    if (existingInvitation) throw new CustomError(400, '이미 초대된 사용자입니다');
+    if (existingMember && existingMember.memberStatus === 'rejected') {
+      const [invitation, projectMember] = await this.repo.resendInvitation(
+        existingMember.invitationId!,
+      );
+      console.log(`초대 코드: ${invitation.id}`);
+      return { invitationId: invitation.id.toString() };
+    }
 
-    const invitation = await this.repo.createInvitation(sendUserId, receiveUserId, projectId);
-    console.log(`초대 코드: ${invitation.id}`);
-    return { invitationId: invitation.id.toString() };
+    if (!existingMember) {
+      const invitation = await this.repo.createInvitation(sendUserId, receiveUserId, projectId);
+      console.log(`초대 코드: ${invitation.id}`);
+      return { invitationId: invitation.id.toString() };
+    }
   };
 }
