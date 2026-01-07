@@ -13,5 +13,5 @@ export const subtaskIdParamSchema = z.object({
 });
 
 export const updateSubtaskBodySchema = z.object({
-  title: z.string().min(1).max(100),
+  title: z.string().min(1).max(100).optional(),
 });
