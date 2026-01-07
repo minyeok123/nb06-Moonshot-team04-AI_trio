@@ -23,8 +23,17 @@ export class InvitationRepo {
     projectId: number,
     invitationId: number,
   ) => {
-    return tx.projectMember.create({
-      data: {
+    return tx.projectMember.upsert({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId,
+        },
+      },
+      update: {
+        memberStatus: 'accepted',
+      },
+      create: {
         userId,
         projectId,
         role: 'member',
@@ -35,6 +44,8 @@ export class InvitationRepo {
   };
 
   deleteInvitation = async (invitationId: number) => {
-    return await prisma.invitation.delete({ where: { id: invitationId } });
+    return await prisma.invitation.delete({
+      where: { id: invitationId },
+    });
   };
 }

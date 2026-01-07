@@ -2,43 +2,57 @@ import { prisma } from '../../libs/prisma';
 
 export class MemberRepo {
   findMembersByProjectId = async (projectId: number, skip: number, take: number) => {
-    const [members, total] = await Promise.all([
-      prisma.projectMember.findMany({
-        where: { projectId },
-        skip,
-        take,
-        include: {
-          users: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profileImgUrl: true,
-              _count: {
-                select: { tasks: true },
-              },
-            },
-          },
-          projectInvitation: {
-            select: {
-              id: true,
-              invitationStatus: true,
+    return await prisma.invitation.findMany({
+      where: { projectId },
+      skip,
+      take,
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImgUrl: true,
+            _count: {
+              select: { tasks: true },
             },
           },
         },
-      }),
-
-      prisma.projectMember.count({
-        where: { projectId },
-      }),
-    ]);
-    return { members, total };
+        projectMember: {
+          select: {
+            memberStatus: true,
+          },
+        },
+      },
+    });
   };
 
   findProjectMember = async (projectId: number, userId: number) => {
     const member = await prisma.projectMember.findFirst({
       where: { projectId, userId },
-      include: { projects: true },
+      include: { projects: true, projectInvitation: true },
+    });
+    return member;
+  };
+
+  findProjectOwnerInfo = async (projectId: number) => {
+    const member = await prisma.project.findFirst({
+      where: { id: projectId },
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImgUrl: true,
+            _count: {
+              select: {
+                tasks: true,
+              },
+            },
+          },
+        },
+      },
     });
     return member;
   };
@@ -82,5 +96,18 @@ export class MemberRepo {
         invitationStatus: 'pending',
       },
     });
+  };
+
+  resendInvitation = async (invitationId: number) => {
+    return await prisma.$transaction([
+      prisma.invitation.update({
+        where: { id: invitationId },
+        data: { invitationStatus: 'pending' },
+      }),
+      prisma.projectMember.update({
+        where: { invitationId },
+        data: { memberStatus: 'accepted' },
+      }),
+    ]);
   };
 }
