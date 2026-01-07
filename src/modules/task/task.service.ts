@@ -2,6 +2,7 @@ import { TaskRepo } from './task.repo';
 import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
 import { UpdateTaskBodyDto } from './task.validator';
+import { BASE_URL } from '../../libs/constants';
 
 type UpdateTaskResult = {
   id: number;
@@ -68,6 +69,8 @@ export class TaskService {
     }
 
     const createTask = await this.repo.findTaskWithRelations(task.id);
+
+    const baseUrl = BASE_URL;
 
     return {
       id: createTask!.id,

@@ -22,6 +22,8 @@ const CRYPTO_SECRET_KEY =
   process.env.TOKEN_SECRET_KEY ||
   'c7b6f1a0e8e9d6c2a1d34f6b87a9e92d9f34f1a8e71b0b8c8e2a1a9e4d2f6c3b';
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3005';
+
 export {
   PORT,
   DATABASE_URL,
@@ -37,4 +39,5 @@ export {
   SESSION_SECRET,
   CRYPTO_SECRET_KEY,
   FRONTEND_URL,
+  BASE_URL,
 };

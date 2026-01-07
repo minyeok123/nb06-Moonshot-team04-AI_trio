@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 export function attachFilePath(req: Request, _res: Response, next: NextFunction) {
   if (req.file) {
-    req.body.img = `/uploads/${req.file.filename}`;
+    req.body.file = `/uploads/${req.file.filename}`;
   }
 
   next();

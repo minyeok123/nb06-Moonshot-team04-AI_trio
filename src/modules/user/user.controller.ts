@@ -7,14 +7,12 @@ const userService = new UserService(userRepo);
 
 export class UserController {
   static userInfo = async (req: Request, res: Response, next: NextFunction) => {
-    const checkUser = req.user;
-    // authenticate에서 조회 한 정보 바로 사용
-
-    res.status(200).json(checkUser);
+    const userInfo = await userService.getUserInfo(req.user.id);
+    res.status(200).json(userInfo);
   };
 
   static userInfoChange = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.body.img ?? null };
+    const data = { ...req.body, profileImgUrl: req.body.file ?? null };
     const userInfo = await userService.userInfoUpdate(data, req.user.id);
     res.status(200).json(userInfo);
   };

@@ -9,6 +9,7 @@ import {
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_URI,
   RESPONSE_TYPE,
+  BASE_URL,
 } from '../../libs/constants';
 import axios from 'axios';
 import { encryptToken } from './utils/crypt';
@@ -41,11 +42,15 @@ export class AuthService {
 
     const user = await this.repo.create(dataToSave);
     const { password: _, ...userWithoutPassword } = user;
+
+    const baseUrl = BASE_URL;
     const response: ResponseUser = {
       id: userWithoutPassword['id'],
       email: userWithoutPassword['email'],
       name: userWithoutPassword['name'],
-      profileImage: userWithoutPassword['profileImgUrl'],
+      profileImage: userWithoutPassword['profileImgUrl']
+        ? `${baseUrl}${userWithoutPassword.profileImgUrl}`
+        : null,
       createdAt: userWithoutPassword['createdAt'],
       updatedAt: userWithoutPassword['updatedAt'],
     };

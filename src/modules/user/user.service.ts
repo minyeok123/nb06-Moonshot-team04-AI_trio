@@ -2,6 +2,7 @@ import { User } from '../../types/user';
 import { UserRepo } from './user.repo';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../../libs/error';
+import { BASE_URL } from '../../libs/constants';
 
 type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
   currentPassword: string;
@@ -11,6 +12,24 @@ type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
 
 export class UserService {
   constructor(private repo: UserRepo) {}
+
+  getUserInfo = async (userId: number) => {
+    const user: User = await this.repo.findUserById(userId);
+    if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
+
+    const baseUrl = BASE_URL;
+
+    const { password: _, ...userWithoutPW } = user;
+
+    const userInfo = {
+      ...userWithoutPW,
+      profileImgUrl: userWithoutPW.profileImgUrl
+        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
+        : null,
+    };
+
+    return userInfo;
+  };
 
   // 내 정보 수정
   userInfoUpdate = async (data: UserInfo, userId: number) => {
@@ -48,7 +67,17 @@ export class UserService {
     }
 
     const userUpdate = await this.repo.findUserById(userId);
-    const { password: _, ...userInfo } = userUpdate;
+
+    const baseUrl = BASE_URL;
+
+    const { password: _, ...userWithoutPW } = userUpdate;
+
+    const userInfo = {
+      ...userWithoutPW,
+      profileImgUrl: userWithoutPW.profileImgUrl
+        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
+        : null,
+    };
 
     return userInfo;
   };

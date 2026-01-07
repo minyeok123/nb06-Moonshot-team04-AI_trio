@@ -43,7 +43,9 @@ export class UserRepo {
       take,
       orderBy,
       include: {
-        projectMembers: true,
+        projectMembers: {
+          where: { memberStatus: 'accepted' },
+        },
         tasks: true,
       },
     });
