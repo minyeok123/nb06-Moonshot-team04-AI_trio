@@ -1,8 +1,14 @@
 import { z } from 'zod';
 
 export const getMemberQuerySchema = z.object({
-  page: z.coerce.number().int().positive().optional(),
-  limit: z.coerce.number().int().max(100).positive().optional(),
+  page: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().positive().default(1),
+  ),
+  limit: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().max(100).positive().default(10),
+  ),
 });
 
 export const getMemberParamsSchema = z.object({

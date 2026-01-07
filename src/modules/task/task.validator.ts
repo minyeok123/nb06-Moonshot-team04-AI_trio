@@ -15,15 +15,30 @@ export const taskValidator = z.object({
 });
 
 export const listTaskQuerySchema = z.object({
-  page: z.coerce.number().int().positive().min(1).default(1),
-  limit: z.coerce.number().int().positive().min(1).max(100).default(10),
+  page: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().positive().min(1).default(1),
+  ),
+  limit: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().int().positive().min(1).max(100).default(10),
+  ),
 
-  status: z.enum(['todo', 'in_progress', 'done']).optional(),
-  assignee: z.coerce.number().positive().int().positive().optional(), // userId 필터로 사용
-  keyword: z.string().trim().min(1).optional(),
+  status: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.enum(['todo', 'in_progress', 'done']).optional(),
+  ),
+  assignee: z.preprocess(
+    (v) => (v === '' ? undefined : v),
+    z.coerce.number().positive().int().positive().optional(),
+  ), // userId 필터로 사용
+  keyword: z.preprocess((v) => (v === '' ? undefined : v), z.string().trim().min(1).optional()),
 
-  order: z.enum(['asc', 'desc']).default('desc'),
-  order_by: z.enum(['created_at', 'name', 'end_date']).default('created_at'),
+  order: z.preprocess((v) => (v === '' ? 'desc' : v), z.enum(['asc', 'desc']).default('desc')),
+  order_by: z.preprocess(
+    (v) => (v === '' ? 'created_at' : v),
+    z.enum(['created_at', 'name', 'end_date']).default('created_at'),
+  ),
 });
 
 export const taskIdParamSchema = z.object({

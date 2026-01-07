@@ -8,6 +8,7 @@ declare global {
       refresh?: {
         id: number;
       };
+      validatedQuery?: string | number | unknown;
     }
   }
 }
