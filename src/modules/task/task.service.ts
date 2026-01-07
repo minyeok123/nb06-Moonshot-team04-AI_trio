@@ -1,7 +1,6 @@
 import { TaskRepo } from './task.repo';
 import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
-import { UpdateTaskBodyDto } from './task.validator';
 import { BASE_URL } from '../../libs/constants';
 
 type UpdateTaskResult = {
@@ -22,6 +21,20 @@ type UpdateTaskResult = {
   updatedAt: Date;
 };
 
+type updateTaskBodySchema = {
+  title: string;
+  startYear: number;
+  startMonth: number;
+  startDay: number;
+  endYear: number;
+  endMonth: number;
+  endDay: number;
+  status: 'todo' | 'in_progress' | 'done';
+  assigneeId: number;
+  tags: string[];
+  attachments: string[];
+};
+
 export class TaskService {
   constructor(private repo: TaskRepo) {}
 
@@ -32,9 +45,8 @@ export class TaskService {
   createTask = async (
     userId: number,
     projectId: number,
-    dto: {
+    data: {
       title: string;
-      description: string | '';
       startYear: number;
       startMonth: number;
       startDay: number;
@@ -46,26 +58,29 @@ export class TaskService {
       attachments: string[];
     },
   ) => {
-    const startDate = new Date(dto.startYear, dto.startMonth - 1, dto.startDay);
-    const endDate = new Date(dto.endYear, dto.endMonth - 1, dto.endDay);
+    const startDate = new Date(data.startYear, data.startMonth - 1, data.startDay);
+    const endDate = new Date(data.endYear, data.endMonth - 1, data.endDay);
 
     const task = await this.repo.createTask({
       userId,
       projectId,
-      title: dto.title,
-      description: dto.description,
-      status: dto.status,
+      title: data.title,
+      status: data.status,
       startDate,
       endDate,
     });
 
-    if (dto.tags.length > 0) {
-      const normalizedTags = this.normalizeTags(dto.tags);
-      await this.repo.upsertTags(normalizedTags);
+    const taskId = task.id;
+
+    console.log(`tags.length : ${data.tags.length}`);
+    if (data.tags.length > 0) {
+      const normalizedTags = this.normalizeTags(data.tags);
+      console.log(normalizedTags);
+      await this.repo.upsertTags(normalizedTags, taskId);
     }
 
-    if (dto.attachments.length > 0) {
-      await this.repo.createFiles(task.id, dto.attachments);
+    if (data.attachments.length > 0) {
+      await this.repo.createFiles(task.id, data.attachments);
     }
 
     const createTask = await this.repo.findTaskWithRelations(task.id);
@@ -95,7 +110,7 @@ export class TaskService {
         id: t.tags.id,
         name: t.tags.tag,
       })),
-      attachments: createTask!.files.map((f) => f.url),
+      attachments: createTask!.files.map((f) => `${baseUrl}${f.url}`),
       createdAt: createTask!.createdAt,
       updatedAt: createTask!.updatedAt,
     };
@@ -113,10 +128,13 @@ export class TaskService {
       order_by: 'created_at' | 'name' | 'end_date';
     },
   ) => {
-    const { data, total } = await this.repo.findManyWithTotal({
+    const data = await this.repo.findManyWithTotal({
       projectId,
       ...query,
     });
+
+    const baseUrl = BASE_URL;
+    const total = data.length;
 
     return {
       data: data.map((task) => ({
@@ -142,7 +160,7 @@ export class TaskService {
           id: t.tags.id,
           name: t.tags.tag,
         })),
-        attachments: task.files.map((f) => f.url),
+        attachments: task!.files.map((f: any) => `${baseUrl}${f.url}`),
         createdAt: task.createdAt,
         updatedAt: task.updatedAt,
       })),
@@ -159,6 +177,8 @@ export class TaskService {
 
     const start = task.startDate;
     const end = task.endDate;
+
+    const baseUrl = BASE_URL;
 
     return {
       id: task.id,
@@ -189,7 +209,7 @@ export class TaskService {
         name: t.tags.tag,
       })),
 
-      attachments: task.files.map((f) => f.url),
+      attachments: task!.files.map((f) => `${baseUrl}${f.url}`),
 
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
@@ -205,6 +225,7 @@ export class TaskService {
     const start = task.startDate as Date;
     const end = task.endDate as Date;
 
+    const baseUrl = BASE_URL;
     return {
       id: task.id,
       projectId: task.projectId,
@@ -228,19 +249,19 @@ export class TaskService {
         id: twt.tags.id,
         name: twt.tags.tag,
       })),
-      attachments: (task.files ?? []).map((f: any) => f.url),
+      attachments: task!.files ?? (task!.files.map((f: any) => `${baseUrl}${f.url}`) || null),
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
   };
 
-  updateTask = async (taskId: number, dto: UpdateTaskBodyDto, requesterId: number) => {
+  updateTask = async (taskId: number, dto: updateTaskBodySchema, requesterId: number) => {
     const startDate = this.toDate(dto.startYear, dto.startMonth, dto.startDay);
     const endDate = this.toDate(dto.endYear, dto.endMonth, dto.endDay);
 
     if (endDate < startDate) throw new CustomError(400, '잘못된 요청 입니다');
     console.log(dto.assigneeId);
-    await this.repo.updateTaskCore({
+    const updataTask = await this.repo.updateTaskCore({
       taskId,
       title: dto.title,
       status: dto.status as TaskStatus,
@@ -250,12 +271,12 @@ export class TaskService {
     });
 
     const normalizedTags = this.normalizeTags(dto.tags);
-    const tags = await this.repo.upsertTags(normalizedTags);
+    const tags = await this.repo.upsertTags(normalizedTags, taskId);
 
-    await this.repo.replaceTaskTags(
-      taskId,
-      tags.map((t) => t.id),
-    );
+    // await this.repo.replaceTaskTags(
+    //   taskId,
+    //   tags.map((t) => t.id),
+    // );
     await this.repo.replaceTaskFiles(taskId, dto.attachments ?? []);
 
     const updated = await this.repo.getTaskForResponse(taskId);

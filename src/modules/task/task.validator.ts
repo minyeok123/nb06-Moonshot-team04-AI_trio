@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const taskValidator = z.object({
   title: z.string().min(1),
-  description: z.string().min(1).default(''),
   startYear: z.coerce.number().int().positive().min(2026),
   startMonth: z.coerce.number().int().positive().min(1).max(12),
   startDay: z.coerce.number().int().positive().min(1).max(31),
@@ -61,6 +60,3 @@ export const updateTaskBodySchema = z.object({
   tags: z.array(z.string().min(1).max(50)).default([]),
   attachments: z.array(z.string().url()).default([]),
 });
-
-export type UpdateTaskBodyDto = z.infer<typeof updateTaskBodySchema>;
-export type TaskIdParamDto = z.infer<typeof taskIdParamSchema>;

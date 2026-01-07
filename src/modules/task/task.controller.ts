@@ -20,9 +20,9 @@ export class TaskController {
 
     const data = req.validatedQuery as any;
 
-    const result = await taskService.taskList(projectId, data);
+    const task = await taskService.taskList(projectId, data);
 
-    res.status(200).json(result);
+    res.status(200).json(task);
   };
 
   static getTaskById = async (req: Request, res: Response, next: NextFunction) => {
@@ -38,8 +38,8 @@ export class TaskController {
     const body = req.body;
     const userId = req.user.id;
 
-    const result = await taskService.updateTask(taskId, body, userId);
-    return res.status(200).json(result);
+    const task = await taskService.updateTask(taskId, body, userId);
+    return res.status(200).json(task);
   };
 
   static deleteTask = async (req: Request, res: Response, next: NextFunction) => {

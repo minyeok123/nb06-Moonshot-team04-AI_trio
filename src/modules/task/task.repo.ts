@@ -8,7 +8,6 @@ export class TaskRepo {
     userId: number;
     projectId: number;
     title: string;
-    description: string;
     status: 'todo' | 'in_progress' | 'done';
     startDate: Date;
     endDate: Date;
@@ -18,24 +17,22 @@ export class TaskRepo {
     });
   };
 
-  upsertTags = async (tagNames: string[]) => {
-    return Promise.all(
-      tagNames.map((tag) =>
-        prisma.tag.upsert({
+  upsertTags = async (tagNames: string[], taskId: number) => {
+    return prisma.$transaction(async (tx) => {
+      for (const tag of tagNames) {
+        const tagInfo = await tx.tag.upsert({
           where: { tag },
           update: {},
           create: { tag },
-        }),
-      ),
-    );
-  };
+        });
 
-  createTaskTags = (taskId: number, tagIds: number[]) => {
-    return prisma.taskWithTags.createMany({
-      data: tagIds.map((tagId) => ({
-        taskId,
-        tagId,
-      })),
+        await tx.taskWithTags.create({
+          data: {
+            taskId,
+            tagId: tagInfo.id,
+          },
+        });
+      }
     });
   };
 
@@ -62,7 +59,7 @@ export class TaskRepo {
         },
         taskWithTags: {
           include: {
-            tags: true,
+            tags: { select: { id: true, tag: true } },
           },
         },
         files: true,
@@ -86,14 +83,7 @@ export class TaskRepo {
       projectId,
       ...(status ? { status } : {}),
       ...(assignee ? { userId: Number(assignee) } : {}),
-      ...(keyword
-        ? {
-            OR: [
-              { title: { contains: keyword, mode: 'insensitive' as const } },
-              { description: { contains: keyword, mode: 'insensitive' as const } },
-            ],
-          }
-        : {}),
+      ...(keyword ? { title: { contains: keyword, mode: 'insensitive' as const } } : {}),
     };
 
     const orderBy = this.toOrderBy(order_by, order);
@@ -101,33 +91,28 @@ export class TaskRepo {
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    const [data, total] = await Promise.all([
-      prisma.task.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limitNum,
-        include: {
-          users: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profileImgUrl: true,
-            },
+    return await prisma.task.findMany({
+      where,
+      orderBy,
+      skip,
+      take: limitNum,
+      include: {
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profileImgUrl: true,
           },
-          taskWithTags: {
-            include: {
-              tags: true,
-            },
-          },
-          files: true,
         },
-      }),
-      prisma.task.count({ where }),
-    ]);
-
-    return { data, total };
+        taskWithTags: {
+          include: {
+            tags: true,
+          },
+        },
+        files: true,
+      },
+    });
   };
 
   toOrderBy = (order_by: OrderBy, order: Order) => {
