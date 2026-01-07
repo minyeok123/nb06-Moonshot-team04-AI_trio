@@ -13,8 +13,6 @@ export class SubtaskService {
   getSubtasks = async (taskId: number) => {
     const subtasks = await this.repo.getSubtasks(taskId);
     if (!subtasks) throw new CustomError(404, '데이터 조회 실패');
-    const subtaskCount = await this.repo.subtaskCount(taskId);
-    if (!subtaskCount) throw new CustomError(400, '데이터 조회 실패');
     const formatted = subtasks.map((s) => ({
       id: s.id,
       title: s.content,
@@ -23,7 +21,7 @@ export class SubtaskService {
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
     }));
-    return { data: formatted, total: subtaskCount._count.subTasks };
+    return { data: formatted, total: formatted.length };
   };
 
   getSubtask = async (subtaskId: number) => {
@@ -34,7 +32,10 @@ export class SubtaskService {
   };
 
   updateSubtask = async (subtaskId: number, title: string) => {
-    const subtask = await this.repo.updateSubtask(subtaskId, title);
+    const checkStatus = await this.repo.getSubtask(subtaskId);
+    if (!checkStatus) throw new CustomError(404, '데이터 조회 실패');
+    const status = checkStatus.status === 'todo' ? 'done' : 'todo';
+    const subtask = await this.repo.updateSubtask(subtaskId, title, status);
     if (!subtask) throw new CustomError(400, '데이터 수정 실패');
     const { content, ...rest } = subtask;
     return { ...rest, title: content };
