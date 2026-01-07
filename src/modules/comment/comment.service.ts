@@ -29,6 +29,9 @@ export class CommentService {
       skip: (page - 1) * limit,
       take: limit,
     });
+    const commentCount = await this.repo.getCommentCount({
+      where: { taskId },
+    });
 
     const mappedList = commentList.map((comments) => ({
       id: comments['id'],
@@ -43,7 +46,8 @@ export class CommentService {
       createdAt: comments['createdAt'],
       updatedAt: comments['updatedAt'],
     }));
-    const response = { data: mappedList, total: mappedList.length };
+
+    const response = { data: mappedList, total: commentCount };
     return response;
   };
 

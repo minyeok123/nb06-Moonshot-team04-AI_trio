@@ -30,6 +30,11 @@ export class CommentRepo {
       select: this.selectOptions,
     });
   };
+
+  getCommentCount = async (options: Prisma.CommentCountArgs) => {
+    return prisma.comment.count({ ...options });
+  };
+
   getCommentDetail = async (options: Prisma.CommentFindUniqueArgs) => {
     return prisma.comment.findUnique({
       ...options,
