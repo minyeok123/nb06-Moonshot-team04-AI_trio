@@ -8,6 +8,7 @@ const userService = new UserService(userRepo);
 export class UserController {
   static userInfo = async (req: Request, res: Response, next: NextFunction) => {
     const checkUser = req.user;
+    // authenticate에서 조회 한 정보 바로 사용
 
     res.status(200).json(checkUser);
   };
@@ -21,7 +22,7 @@ export class UserController {
   static getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user.id;
     const { page, limit, order, order_by } = req.validatedQuery as any;
-    const result = await userService.getMyProjectList({
+    const projectList = await userService.getMyProjectList({
       userId,
       page,
       limit,
@@ -29,7 +30,7 @@ export class UserController {
       orderByKey: order_by,
     });
 
-    res.status(200).json(result);
+    res.status(200).json(projectList);
   };
 
   static getMyTasks = async (req: Request, res: Response, next: NextFunction) => {

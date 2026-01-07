@@ -5,17 +5,17 @@ export class UserRepo {
     return await prisma.user.findUniqueOrThrow({ where: { id: userId! } });
   };
 
-  updateUserInfoImg = async (userId: number, profileImgUrl: string | null) => {
-    return await await prisma.user.update({
+  updateUserPassword = async (userId: number, password: string) => {
+    return await prisma.user.update({
       where: { id: userId },
-      data: { profileImgUrl },
+      data: { password },
     });
   };
 
-  updateUserInfoAll = async (userId: number, profileImgUrl: string | null, password: string) => {
-    return await await prisma.user.update({
+  updateUserImg = async (userId: number, profileImgUrl: string) => {
+    return await prisma.user.update({
       where: { id: userId },
-      data: { profileImgUrl, password },
+      data: { profileImgUrl },
     });
   };
 
@@ -49,27 +49,15 @@ export class UserRepo {
     });
   };
 
-  countUserProjects = async (userId: number) => {
-    return prisma.project.count({
-      where: {
-        projectMembers: {
-          some: {
-            userId,
-            memberStatus: 'accepted',
-          },
-        },
-      },
-    });
-  };
-
   findMyTasks = async (userId: number, query: any) => {
     const { from, to, project_id, status, assignee_id, keyword } = query;
+    const assigneeId = Number(assignee_id);
 
     return prisma.task.findMany({
       where: {
         projectId: project_id,
         status,
-        userId: assignee_id,
+        userId: assigneeId,
         title: keyword ? { contains: keyword, mode: 'insensitive' } : undefined,
         AND: [
           from ? { startDate: { gte: new Date(from) } } : {},
