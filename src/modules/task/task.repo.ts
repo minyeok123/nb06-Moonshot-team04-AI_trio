@@ -62,7 +62,11 @@ export class TaskRepo {
             tags: { select: { id: true, tag: true } },
           },
         },
-        files: true,
+        files: {
+          select: {
+            url: true,
+          },
+        },
       },
     });
   };
@@ -91,28 +95,33 @@ export class TaskRepo {
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    return await prisma.task.findMany({
-      where,
-      orderBy,
-      skip,
-      take: limitNum,
-      include: {
-        users: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            profileImgUrl: true,
+    const [data, total] = await Promise.all([
+      prisma.task.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          users: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              profileImgUrl: true,
+            },
           },
-        },
-        taskWithTags: {
-          include: {
-            tags: true,
+          taskWithTags: {
+            include: {
+              tags: true,
+            },
           },
+          files: true,
         },
-        files: true,
-      },
-    });
+      }),
+      prisma.task.count({ where }),
+    ]);
+
+    return { data, total };
   };
 
   toOrderBy = (order_by: OrderBy, order: Order) => {

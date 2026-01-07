@@ -38,7 +38,7 @@ export class TaskController {
     const body = req.body;
     const userId = req.user.id;
 
-    const task = await taskService.updateTask(taskId, body, userId);
+    const task = await taskService.updateTask(taskId, body);
     return res.status(200).json(task);
   };
 

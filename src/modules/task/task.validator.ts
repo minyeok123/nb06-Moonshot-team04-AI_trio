@@ -1,5 +1,22 @@
 import { z } from 'zod';
 
+const tagsSchema = z
+  .preprocess((val) => {
+    if (val === undefined || val === null || val === '') return [];
+
+    if (typeof val === 'string') {
+      try {
+        const parsed = JSON.parse(val);
+        return parsed;
+      } catch {
+        return [val];
+      }
+    }
+
+    return val;
+  }, z.array(z.string()))
+  .default([]);
+
 export const taskValidator = z.object({
   title: z.string().min(1),
   startYear: z.coerce.number().int().positive().min(2026),
@@ -9,7 +26,7 @@ export const taskValidator = z.object({
   endMonth: z.coerce.number().int().positive().min(1).max(12),
   endDay: z.coerce.number().int().positive().min(1).max(31),
   status: z.enum(['todo', 'in_progress', 'done']).default('todo'),
-  tags: z.array(z.string()).default([]),
+  tags: tagsSchema,
   attachments: z.array(z.string()).default([]),
 });
 
@@ -57,6 +74,6 @@ export const updateTaskBodySchema = z.object({
   status: z.enum(['todo', 'in_progress', 'done']),
   assigneeId: z.coerce.number().int().positive(),
 
-  tags: z.array(z.string().min(1).max(50)).default([]),
+  tags: tagsSchema,
   attachments: z.array(z.string().url()).default([]),
 });
