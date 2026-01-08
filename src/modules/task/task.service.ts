@@ -2,6 +2,8 @@ import { TaskRepo } from './task.repo';
 import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
 import { BASE_URL } from '../../libs/constants';
+import { getGoogleAccessTokenFromRefresh } from './google/token';
+import { GoogleCalendar } from './google/googleCalendar';
 
 type updateTaskBody = {
   title: string;
@@ -110,6 +112,22 @@ export class TaskService {
 
     const createTask = await this.repo.findTaskWithRelations(task.id);
 
+    // 구글 캘린더 생성 연동
+    try {
+      const googleAccessToken = await getGoogleAccessTokenFromRefresh(userId);
+      if (!googleAccessToken) throw new CustomError(404, '데이터 조회 실패');
+      const event = await GoogleCalendar.createCalendarEvent(googleAccessToken, {
+        title: task.title,
+        description: task.description || '',
+        startDate: task.startDate,
+        endDate: task.endDate,
+      });
+      await this.repo.updateTaskEventId(task.id, event.id);
+      console.log(event);
+    } catch (e) {
+      console.log(e);
+    }
+
     return this.mapResponse(createTask);
   };
 
@@ -177,11 +195,48 @@ export class TaskService {
     const updated = await this.repo.findTaskWithRelations(taskId);
     if (!updated) throw new CustomError(400, '데이터가 존재하지 않습니다');
 
+    // 구글 캘린더 업데이트 연동
+    try {
+      if (updated.calendarId !== null) {
+        const googleAccessToken = await getGoogleAccessTokenFromRefresh(updated.userId);
+        if (!googleAccessToken) throw new CustomError(404, '데이터 조회 실패');
+        const event = await GoogleCalendar.updateCalendarEvent(
+          googleAccessToken,
+          updated.calendarId!,
+          {
+            title: updated.title,
+            description: updated.description || '',
+            startDate: updated.startDate,
+            endDate: updated.endDate,
+          },
+        );
+        console.log(event);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
     return this.mapResponse(updated);
   };
 
   // 할 일 삭제
   deleteTask = async (taskId: number) => {
+    // 구글 캘린더 삭제 연동
+    try {
+      const checkEventId = await this.repo.findTaskInfoById(taskId);
+      if (checkEventId && checkEventId.calendarId !== null) {
+        const googleAccessToken = await getGoogleAccessTokenFromRefresh(checkEventId?.userId);
+        if (!googleAccessToken) throw new CustomError(404, '데이터 조회 실패');
+        const event = await GoogleCalendar.deleteCalendarEvent(
+          googleAccessToken,
+          checkEventId.calendarId,
+        );
+        console.log(event);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
     return this.repo.deleteTaskById(taskId);
   };
 }
