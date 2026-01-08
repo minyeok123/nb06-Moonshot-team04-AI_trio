@@ -33,13 +33,7 @@ export class AuthRepo {
     return await prisma.user.findUnique({ where: { email }, include: { oauths: true } });
   };
 
-  updateOAuth = async (
-    accessToken: string,
-    refreshToken: string,
-    exp: Date,
-    sub: string,
-    type: 'google' = 'google',
-  ) => {
+  updateOAuth = async (refreshToken: string, exp: Date, sub: string, type: 'google' = 'google') => {
     return await prisma.oauth.update({
       where: {
         provider_providerId: {
@@ -48,7 +42,6 @@ export class AuthRepo {
         },
       },
       data: {
-        accessToken,
         refreshToken,
         expirationAt: exp,
       },
@@ -59,7 +52,6 @@ export class AuthRepo {
     email: string,
     name: string,
     picture: string,
-    encryptedAccess: string,
     encryptedRefresh: string,
     expiresAt: Date,
     sub: string,
@@ -74,7 +66,6 @@ export class AuthRepo {
           create: {
             provider: type,
             providerId: sub,
-            accessToken: encryptedAccess,
             refreshToken: encryptedRefresh,
             expirationAt: expiresAt,
           },

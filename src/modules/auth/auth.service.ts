@@ -108,8 +108,7 @@ export class AuthService {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    const { access_token, refresh_token, id_token, expires_in } = response.data;
-    const encryptedAccess = encryptToken(access_token);
+    const { refresh_token, id_token, expires_in } = response.data;
     const encryptedRefresh = encryptToken(refresh_token);
     const { sub, email, name, picture } = token.decodeToken(id_token);
     const expiresAt = new Date(expires_in * 1000);
@@ -118,13 +117,7 @@ export class AuthService {
       (oauth) => oauth.providerId === sub && oauth.provider === 'google',
     );
     if (existingOAuth) {
-      const updateOAuth = await this.repo.updateOAuth(
-        encryptedAccess,
-        encryptedRefresh,
-        expiresAt,
-        sub,
-        'google',
-      );
+      const updateOAuth = await this.repo.updateOAuth(encryptedRefresh, expiresAt, sub, 'google');
 
       if (!updateOAuth) throw new CustomError(404, '구글 로그인 실패');
 
@@ -141,7 +134,6 @@ export class AuthService {
         email,
         name,
         picture,
-        encryptedAccess,
         encryptedRefresh,
         expiresAt,
         sub,

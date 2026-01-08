@@ -164,7 +164,6 @@ async function main() {
           userId: user.id,
           provider: Provider.local,
           providerId: `local-${user.id}`,
-          accessToken: `access-token-${i}`,
           refreshToken: `refresh-token-${i}`,
           expirationAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         },
