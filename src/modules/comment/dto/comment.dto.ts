@@ -14,16 +14,16 @@ interface commentResponse {
 
 export function mapResponse(comment: commentResponse) {
   return {
-    id: comment['id'],
-    content: comment['content'],
-    taskId: comment['taskId'],
+    id: comment.id,
+    content: comment.content,
+    taskId: comment.taskId,
     author: {
-      id: comment['users']['id'],
-      name: comment['users']['name'],
-      email: comment['users']['email'],
-      profileImage: comment['users']?.['profileImgUrl'],
+      id: comment.users.id,
+      name: comment.users.name,
+      email: comment.users.email,
+      profileImage: comment.users?.profileImgUrl,
     },
-    createdAt: comment['createdAt'],
-    updatedAt: comment['updatedAt'],
+    createdAt: comment.createdAt,
+    updatedAt: comment.updatedAt,
   };
 }
