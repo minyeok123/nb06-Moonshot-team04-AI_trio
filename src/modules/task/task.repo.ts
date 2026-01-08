@@ -218,4 +218,8 @@ export class TaskRepo {
       });
     });
   };
+
+  updateTaskEventId = async (taskId: number, calendarId: string) => {
+    return await prisma.task.update({ where: { id: taskId }, data: { calendarId: calendarId } });
+  };
 }
