@@ -4,14 +4,8 @@ import type { User } from '../../types/user';
 import token from './utils/token';
 import { CustomError } from '../../libs/error';
 import { compareData, hashData } from './utils/hash';
-import {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI,
-  RESPONSE_TYPE,
-  BASE_URL,
-} from '../../libs/constants';
-import axios from 'axios';
+import { BASE_URL } from '../../libs/constants';
+import { googleOAuthAdapter } from './adapters/googleOAuth.adapter';
 import { encryptToken } from './utils/crypt';
 
 type RegisterData = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password: string };
@@ -82,33 +76,13 @@ export class AuthService {
   };
 
   googleLogin = async (state: string) => {
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID!,
-      redirect_uri: GOOGLE_REDIRECT_URI!,
-      response_type: RESPONSE_TYPE!,
-      scope: 'openid email profile https://www.googleapis.com/auth/calendar',
-      state: state,
-      access_type: 'offline',
-      prompt: 'consent',
-    });
-    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    return googleOAuthAdapter.getLoginUrl(state);
   };
 
   googleLoginByGoogleInfo = async (code: string) => {
-    const url = 'https://oauth2.googleapis.com/token';
-    const params = new URLSearchParams({
+    const { refresh_token, id_token, expires_in } = await googleOAuthAdapter.exchangeCodeForToken(
       code,
-      client_id: GOOGLE_CLIENT_ID!,
-      client_secret: GOOGLE_CLIENT_SECRET!,
-      redirect_uri: GOOGLE_REDIRECT_URI!,
-      grant_type: 'authorization_code',
-    });
-    const response = await axios.post(url, params.toString(), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
-    const { refresh_token, id_token, expires_in } = response.data;
+    );
     const encryptedRefresh = encryptToken(refresh_token);
     const { sub, email, name, picture } = token.decodeToken(id_token);
     const expiresAt = new Date(expires_in * 1000);
