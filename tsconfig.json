@@ -8,7 +8,11 @@
     "esModuleInterop": true, // import 호환
     "moduleResolution": "node", // Node 모듈 해석
     "resolveJsonModule": true, // JSON import 허용
-    "typeRoots": ["./src/types", "./node_modules/@types"] // 커스텀 타입 정의 포함
+    "typeRoots": ["./src/types", "./node_modules/@types"], // 커스텀 타입 정의 포함
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src"], // 컴파일할 폴더
   "exclude": ["node_modules", "dist"] // 제외할 폴더
