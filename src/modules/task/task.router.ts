@@ -3,7 +3,7 @@ import { TaskController } from './task.controller';
 import authenticate from '../../middlewares/authenticate';
 import { Authorize } from '../../middlewares/authorize';
 import asyncHandler from '../../libs/asyncHandler';
-import { validate, tokenValidate } from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate';
 import {
   taskValidator,
   listTaskQuerySchema,
@@ -17,7 +17,6 @@ const router = express.Router();
 
 router.post(
   '/:projectId/tasks',
-  tokenValidate(),
   authenticate,
   Authorize.projectMember,
   upload.array('attachments'),
@@ -28,7 +27,6 @@ router.post(
 
 router.get(
   '/:projectId/tasks',
-  tokenValidate(),
   authenticate,
   Authorize.projectMember,
   validate(listTaskQuerySchema, 'query'),
@@ -37,7 +35,6 @@ router.get(
 
 router.get(
   '/:taskId',
-  tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamSchema, 'params'),
@@ -46,7 +43,6 @@ router.get(
 
 router.patch(
   '/:taskId',
-  tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
   upload.array('attachments'),
@@ -57,7 +53,6 @@ router.patch(
 
 router.delete(
   '/:taskId',
-  tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamSchema, 'params'),

@@ -1,5 +1,5 @@
 import express from 'express';
-import { tokenValidate, validate } from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate';
 import authenticate from '../../middlewares/authenticate';
 import { SubtaskController } from './subtask.controller';
 import asyncHandler from '../../libs/asyncHandler';
@@ -10,7 +10,6 @@ const router = express.Router();
 
 router.post(
   '/:taskId/subtasks',
-  tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamsSchema, 'params'),
@@ -20,7 +19,6 @@ router.post(
 
 router.get(
   '/:taskId/subtasks',
-  tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
   validate(taskIdParamsSchema, 'params'),

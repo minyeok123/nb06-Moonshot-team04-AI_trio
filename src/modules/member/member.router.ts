@@ -1,6 +1,6 @@
 import express from 'express';
 import { MemberController } from './member.controller';
-import { tokenValidate, validate } from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate';
 import {
   getMemberParamsSchema,
   getMemberQuerySchema,
@@ -13,11 +13,9 @@ import { Authorize } from '../../middlewares/authorize';
 import asyncHandler from '../../libs/asyncHandler';
 
 const router = express.Router();
-// tokenValidate,
 
 router.get(
   '/:projectId/users',
-  tokenValidate(),
   authenticate,
   validate(getMemberParamsSchema, 'params'),
   validate(getMemberQuerySchema, 'query'),
@@ -26,7 +24,6 @@ router.get(
 
 router.delete(
   '/:projectId/users/:userId',
-  tokenValidate(),
   authenticate,
   Authorize.projectOwner,
   validate(deleteMemberParamsSchema, 'params'),
@@ -35,7 +32,6 @@ router.delete(
 
 router.post(
   '/:projectId/invitations',
-  tokenValidate(),
   authenticate,
   Authorize.projectOwner,
   validate(createMemberParamsSchema, 'params'),

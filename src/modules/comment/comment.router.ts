@@ -3,7 +3,7 @@ import asyncHandler from '../../libs/asyncHandler';
 import authenticate from '../../middlewares/authenticate';
 import { Authorize } from '../../middlewares/authorize';
 import { CommentController } from './comment.controller';
-import { tokenValidate, validate } from '../../middlewares/validate';
+import { validate } from '../../middlewares/validate';
 import {
   CommentIdParamsSchema,
   CommentQuerySchema,
@@ -16,7 +16,6 @@ const router = express.Router();
 router
   .post(
     '/:taskId/comments',
-    tokenValidate(),
     authenticate,
     validate(CreateCommentSchema),
     validate(TaskIdParamsSchema, 'params'),
@@ -25,7 +24,6 @@ router
   )
   .get(
     '/:taskId/comments',
-    tokenValidate(),
     authenticate,
     validate(TaskIdParamsSchema, 'params'),
     validate(CommentQuerySchema, 'query'),
@@ -35,7 +33,6 @@ router
 router
   .get(
     '/:commentId',
-    tokenValidate(),
     authenticate,
     validate(CommentIdParamsSchema, 'params'),
     Authorize.commentAuthorize,
@@ -43,7 +40,6 @@ router
   )
   .patch(
     '/:commentId',
-    tokenValidate(),
     authenticate,
     validate(CommentIdParamsSchema, 'params'),
     validate(PatchCommentSchema),
@@ -52,7 +48,6 @@ router
   )
   .delete(
     '/:commentId',
-    tokenValidate(),
     authenticate,
     validate(CommentIdParamsSchema, 'params'),
     Authorize.commentAuthorize,

@@ -8,9 +8,11 @@ const userRepo = new UserRepo();
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader) throw new CustomError(401, '로그인이 필요합니다');
-    const isAccessToken = authHeader.split(' ')[1];
-    const payload = token.verifyAccessToken(isAccessToken);
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new CustomError(401, '로그인이 필요합니다');
+    }
+    const accessToken = authHeader.split(' ')[1];
+    const payload = token.verifyAccessToken(accessToken);
     if (!payload) throw new CustomError(401, '토큰 만료');
     const user = await userRepo.findUserById(payload.userId);
     if (!user) throw new CustomError(404, '사용자 확인이 불가능합니다');
