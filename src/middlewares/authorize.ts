@@ -7,14 +7,18 @@ export class Authorize {
   static projectOwner = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { projectId, invitationId } = req.params;
-      if (!projectId && !invitationId) throw new CustomError(404, '잘못된 요청 형식');
+      if (!projectId && !invitationId) {
+        throw new CustomError(404, '잘못된 요청 형식');
+      }
+
       const operatorId = req.user.id;
+
       let pid: number | undefined;
       if (projectId) pid = Number(projectId);
       if (invitationId) {
-        const iid = await memberRepo.findProjectIdByInvitationId(Number(invitationId));
-        pid = iid;
+        pid = await memberRepo.findProjectIdByInvitationId(Number(invitationId)); // @mentor: 잘못된 네이밍, 초대 코드를 기반으로 프로젝트 ID를 반환하는 부분입니다. invitationId가 아닌 projectId로 선언해도 충분합니다.
       }
+
       if (!pid) throw new CustomError(400, '잘못된 요청 형식');
       const member = await memberRepo.findProjectMember(pid, operatorId);
       if (!member) throw new CustomError(400, '프로젝트 멤버가 아닙니다');
