@@ -19,7 +19,10 @@ export class Authorize {
         pid = await memberRepo.findProjectIdByInvitationId(Number(invitationId)); // @mentor: 잘못된 네이밍, 초대 코드를 기반으로 프로젝트 ID를 반환하는 부분입니다. invitationId가 아닌 projectId로 선언해도 충분합니다.
       }
 
-      if (!pid) throw new CustomError(400, '잘못된 요청 형식');
+      if (!pid || Number.isNaN(pid)) { // @mentor: 숫자 형태이나 Number(string)이런 형태로 들어올 경우 NaN이 될 수 있습니다. 같이 검증을 추가합니다.
+        throw new CustomError(400, '잘못된 요청 형식');
+      }
+
       const member = await memberRepo.findProjectMember(pid, operatorId);
       if (!member) throw new CustomError(400, '프로젝트 멤버가 아닙니다');
       if (member.role !== 'owner') throw new CustomError(403, '프로젝트 관리자가 아닙니다');
