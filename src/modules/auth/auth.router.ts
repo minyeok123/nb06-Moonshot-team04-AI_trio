@@ -4,7 +4,6 @@ import asyncHandler from '../../libs/asyncHandler';
 import { authenticateRefresh } from '../../middlewares/authenticate.refresh';
 import upload from '../../middlewares/upload';
 import { attachFilePath } from '../../middlewares/attachFilePath';
-import { verifyState } from '../../middlewares/googleAuth';
 import { validate } from '../../middlewares/validate';
 import { loginBodySchema, registerBodySchema } from './auth.validator';
 
@@ -20,6 +19,6 @@ router.post(
 router.post('/login', validate(loginBodySchema, 'body'), asyncHandler(AuthController.login));
 router.post('/refresh', authenticateRefresh, asyncHandler(AuthController.refresh));
 router.get('/google', asyncHandler(AuthController.googleLogin));
-router.get('/google/callback', verifyState, asyncHandler(AuthController.googleCallback));
+router.get('/google/callback', asyncHandler(AuthController.googleCallback));
 
 export default router;

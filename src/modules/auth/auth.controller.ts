@@ -3,6 +3,7 @@ import { AuthRepo } from './auth.repo';
 import { AuthService } from './auth.service';
 import { generateState } from './utils/state';
 import { FRONTEND_URL } from '../../libs/constants';
+import { CustomError } from '../../libs/error';
 
 export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {
@@ -31,6 +32,10 @@ export class AuthController {
   };
 
   static googleCallback = async (req: Request, res: Response) => {
+    if (req.session.oauthState !== req.query.state) {
+      throw new CustomError(404, '부적절한 접근이 감지되었습니다');
+    }
+
     const { code } = req.query;
     const { accessToken, refreshToken } = (await authService.googleLoginByGoogleInfo(
       String(code),
@@ -51,6 +56,7 @@ export class AuthController {
     });
 
     res.status(302).redirect(FRONTEND_URL!);
+    delete req.session.oauthState;
   };
 }
 
