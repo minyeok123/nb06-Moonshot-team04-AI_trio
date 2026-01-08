@@ -11,7 +11,15 @@
     "typeRoots": ["./src/types", "./node_modules/@types"], // 커스텀 타입 정의 포함
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@libs/*": ["src/libs/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@modules/*": ["src/modules/*"],
+      "@types/*": ["src/types/*"]
+      // 예시) import asyncHandler from '@libs/asyncHandler';
+      // 예시) import authenticate from '@middlewares/authenticate';
+      // 예시) import { AuthController } from '@modules/auth/auth.controller';
+      // 예시) import authenticate from '@types/comment';
     }
   },
   "include": ["src"], // 컴파일할 폴더
