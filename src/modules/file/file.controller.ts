@@ -10,8 +10,6 @@ export class FileController {
         return res.status(400).json({ message: '파일이 없습니다.' });
       }
 
-      // console.log(req.file.path);
-
       res.status(201).json({
         profileImage: req.file.path,
       });
