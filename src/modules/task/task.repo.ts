@@ -175,8 +175,8 @@ export class TaskRepo {
     title: string;
     description: string | null;
     status: 'todo' | 'in_progress' | 'done';
-    startDate: Date;
-    endDate: Date;
+    startDate?: Date;
+    endDate?: Date;
     assigneeId: number; // Task.userId로 매핑
   }) => {
     return prisma.task.update({

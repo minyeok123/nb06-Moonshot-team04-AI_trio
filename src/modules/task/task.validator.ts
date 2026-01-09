@@ -61,20 +61,22 @@ export const taskIdParamSchema = z.object({
   taskId: z.coerce.number().positive().int().positive(),
 });
 
-export const updateTaskBodySchema = z.object({
-  title: z.string().min(1).max(200),
-  description: z.string().min(1).max(300).default(''),
-  startYear: z.coerce.number().positive().int().min(2026).max(3000),
-  startMonth: z.coerce.number().positive().int().min(1).max(12),
-  startDay: z.coerce.number().positive().int().min(1).max(31),
+export const updateTaskBodySchema = taskValidator.partial();
 
-  endYear: z.coerce.number().positive().int().min(2026).max(3000),
-  endMonth: z.coerce.number().positive().int().min(1).max(12),
-  endDay: z.coerce.number().positive().int().min(1).max(31),
+// z.object({
+//   title: z.string().min(1).max(200),
+//   description: z.string().min(1).max(300).default(''),
+//   startYear: z.coerce.number().positive().int().min(2026).max(3000),
+//   startMonth: z.coerce.number().positive().int().min(1).max(12),
+//   startDay: z.coerce.number().positive().int().min(1).max(31),
 
-  status: z.enum(['todo', 'in_progress', 'done']),
-  assigneeId: z.coerce.number().int().positive(),
+//   endYear: z.coerce.number().positive().int().min(2026).max(3000),
+//   endMonth: z.coerce.number().positive().int().min(1).max(12),
+//   endDay: z.coerce.number().positive().int().min(1).max(31),
 
-  tags: tagsSchema,
-  attachments: z.array(z.string()).default([]),
-});
+//   status: z.enum(['todo', 'in_progress', 'done']),
+//   assigneeId: z.coerce.number().int().positive(),
+
+//   tags: tagsSchema,
+//   attachments: z.array(z.string()).default([]),
+// });
