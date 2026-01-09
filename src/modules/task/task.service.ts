@@ -179,8 +179,8 @@ export class TaskService {
       title: data.title,
       description: data.description ?? '',
       status: data.status as TaskStatus,
-      startDate,
-      endDate,
+      startDate: isNaN(startDate.getTime()) ? undefined : startDate,
+      endDate: isNaN(endDate.getTime()) ? undefined : endDate,
       assigneeId: data.assigneeId,
     });
 

@@ -53,13 +53,12 @@ export class UserRepo {
 
   findMyTasks = async (userId: number, query: any) => {
     const { from, to, project_id, status, assignee_id, keyword } = query;
-    const assigneeId = Number(assignee_id);
 
     return prisma.task.findMany({
       where: {
         projectId: project_id,
         status,
-        userId: assigneeId,
+        userId: assignee_id,
         title: keyword ? { contains: keyword, mode: 'insensitive' } : undefined,
         AND: [
           from ? { startDate: { gte: new Date(from) } } : {},
