@@ -11,9 +11,11 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
     const token = header?.split(' ')[1];
     const payload = Token.verifyRefreshToken(token);
     if (!payload) throw new CustomError(401, '토큰 만료');
-    const saveOrNot = await prisma.refreshToken.findFirst({ where: { userId: payload.id } });
-    if (!saveOrNot) throw new CustomError(401, '토큰이 없습니다');
-    const compareRefresh = await compareData(token, saveOrNot.token);
+    const savedRefreshToken = await prisma.refreshToken.findFirst({
+      where: { userId: payload.id },
+    });
+    if (!savedRefreshToken) throw new CustomError(401, '토큰이 없습니다');
+    const compareRefresh = await compareData(token, savedRefreshToken.token);
     if (!compareRefresh) throw new CustomError(401, '잘못된 접근입니다');
     req.refresh = { id: payload.id };
     next();

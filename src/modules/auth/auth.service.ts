@@ -67,8 +67,8 @@ export class AuthService {
     const { accessToken, refreshToken } = token.createTokens(getUser.id);
     const { id, exp } = token.verifyRefreshToken(refreshToken);
     const expiresAt = new Date(exp! * 1000);
-    const hashedrefreshToken = await hashData(refreshToken);
-    const _ = await this.repo.saveRefresh(hashedrefreshToken, id, expiresAt);
+    const hashedRefreshToken = await hashData(refreshToken);
+    const _ = await this.repo.saveRefresh(hashedRefreshToken, id, expiresAt);
     return { accessToken, refreshToken };
   };
 
@@ -76,8 +76,8 @@ export class AuthService {
     const { accessToken, refreshToken } = token.createTokens(userId);
     const { id, exp } = token.verifyRefreshToken(refreshToken);
     const expiresAt = new Date(exp! * 1000);
-    const hashedrefreshToken = await hashData(refreshToken);
-    const _ = await this.repo.saveRefresh(hashedrefreshToken, id, expiresAt);
+    const hashedRefreshToken = await hashData(refreshToken);
+    const _ = await this.repo.saveRefresh(hashedRefreshToken, id, expiresAt);
     return { accessToken, refreshToken };
   };
 
@@ -124,8 +124,8 @@ export class AuthService {
       const { accessToken, refreshToken } = token.createTokens(updateOAuth.userId);
       const { id, exp } = token.verifyRefreshToken(refreshToken);
       const refreshTokenExpiresAt = new Date(exp! * 1000);
-      const hashedrefreshToken = await hashData(refreshToken);
-      const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
+      const hashedRefreshToken = await hashData(refreshToken);
+      const _ = await this.repo.saveRefresh(hashedRefreshToken, id, refreshTokenExpiresAt);
       return { accessToken, refreshToken };
     }
 
@@ -145,8 +145,8 @@ export class AuthService {
       const { accessToken, refreshToken } = token.createTokens(createUser.id);
       const { id, exp } = token.verifyRefreshToken(refreshToken);
       const refreshTokenExpiresAt = new Date(exp! * 1000);
-      const hashedrefreshToken = await hashData(refreshToken);
-      const _ = await this.repo.saveRefresh(hashedrefreshToken, id, refreshTokenExpiresAt);
+      const hashedRefreshToken = await hashData(refreshToken);
+      const _ = await this.repo.saveRefresh(hashedRefreshToken, id, refreshTokenExpiresAt);
       return { accessToken, refreshToken };
     }
   };
