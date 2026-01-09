@@ -34,17 +34,17 @@ export class CommentService {
     });
 
     const mappedList = commentList.map((comments) => ({
-      id: comments['id'],
-      content: comments['content'],
-      taskId: comments['taskId'],
+      id: comments.id,
+      content: comments.content,
+      taskId: comments.taskId,
       author: {
-        id: comments['users']['id'],
-        name: comments['users']['name'],
-        email: comments['users']['email'],
-        profileImage: comments['users']?.['profileImgUrl'],
+        id: comments.users.id,
+        name: comments.users.name,
+        email: comments.users.email,
+        profileImage: comments.users?.profileImgUrl,
       },
-      createdAt: comments['createdAt'],
-      updatedAt: comments['updatedAt'],
+      createdAt: comments.createdAt,
+      updatedAt: comments.updatedAt,
     }));
 
     const response = { data: mappedList, total: commentCount };
