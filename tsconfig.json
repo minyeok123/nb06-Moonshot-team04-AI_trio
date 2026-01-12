@@ -15,11 +15,11 @@
       "@libs/*": ["src/libs/*"],
       "@middlewares/*": ["src/middlewares/*"],
       "@modules/*": ["src/modules/*"],
-      "@types/*": ["src/types/*"]
+      "@app-types/*": ["src/types/*"] // 기존 @types 와 겹쳐서 이름 별도 지정
       // 예시) import asyncHandler from '@libs/asyncHandler';
       // 예시) import authenticate from '@middlewares/authenticate';
       // 예시) import { AuthController } from '@modules/auth/auth.controller';
-      // 예시) import authenticate from '@types/comment';
+      // 예시) import authenticate from '@app-types/comment';
     }
   },
   "include": ["src"], // 컴파일할 폴더

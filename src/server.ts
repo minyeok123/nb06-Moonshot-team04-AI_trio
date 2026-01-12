@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import 'tsconfig-paths/register';
 import { FRONTEND_URL, PORT, SESSION_SECRET } from './libs/constants';
 
 import { defaultNotFoundHandler, globalErrorHandler } from './middlewares/errorHandler';

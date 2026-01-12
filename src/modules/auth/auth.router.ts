@@ -1,10 +1,10 @@
 import express from 'express';
-import { AuthController } from './auth.controller';
-import asyncHandler from '../../libs/asyncHandler';
-import { authenticateRefresh } from '../../middlewares/authenticate.refresh';
-import { verifyState } from '../../middlewares/googleAuth';
-import { validate } from '../../middlewares/validate';
-import { loginBodySchema, registerBodySchema } from './auth.validator';
+import asyncHandler from '@libs/asyncHandler';
+import { authenticateRefresh } from '@middlewares/authenticate.refresh';
+import { verifyState } from '@middlewares/googleAuth';
+import { validate } from '@middlewares/validate';
+import { loginBodySchema, registerBodySchema } from '@modules/auth/auth.validator';
+import { AuthController } from '@modules/auth/auth.controller';
 
 // Auth 전체 분류 - 전역 선언 영역
 /**

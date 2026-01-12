@@ -1,6 +1,6 @@
 import express from 'express';
-import upload from '../../middlewares/upload';
-import { FileController } from './file.controller';
+import upload from '@middlewares/upload';
+import { FileController } from '@modules/file/file.controller';
 
 // File 전체 분류 - 전역 선언 영역
 /**
