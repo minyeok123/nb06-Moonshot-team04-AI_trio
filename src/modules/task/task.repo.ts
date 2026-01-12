@@ -69,6 +69,14 @@ export class TaskRepo {
             url: true,
           },
         },
+        subTasks: {
+          select: {
+            id: true,
+            content: true,
+            taskId: true,
+            status: true,
+          },
+        },
       },
     });
   };
@@ -164,6 +172,14 @@ export class TaskRepo {
         files: {
           select: {
             url: true,
+          },
+        },
+        subTasks: {
+          select: {
+            id: true,
+            content: true,
+            taskId: true,
+            status: true,
           },
         },
       },

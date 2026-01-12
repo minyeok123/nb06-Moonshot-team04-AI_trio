@@ -4,35 +4,35 @@ import bcrypt from 'bcrypt';
 import { CustomError } from '../../libs/error';
 import { BASE_URL } from '../../libs/constants';
 
-type UserInfo = Pick<User, 'email' | 'name' | 'profileImgUrl'> & {
+type ChangePasswordInput = {
   currentPassword: string;
-  newPassword: string;
-  checkNewPassword: string;
+  newPassword?: string;
+  checkNewPassword?: string;
 };
 
 export class UserService {
   constructor(private repo: UserRepo) {}
 
-  getUserInfo = async (userId: number) => {
-    const user: User = await this.repo.findUserById(userId);
-    if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
-
+  mapResponse = (user: any): User => {
     const baseUrl = BASE_URL;
 
     const { password: _, ...userWithoutPW } = user;
 
-    const userInfo = {
+    return {
       ...userWithoutPW,
-      profileImgUrl: userWithoutPW.profileImgUrl
-        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
-        : null,
+      profileImage: userWithoutPW.profileImgUrl ? `${baseUrl}${userWithoutPW.profileImgUrl}` : null,
     };
-
-    return userInfo;
   };
 
-  // 내 정보 수정
-  userInfoUpdate = async (data: UserInfo, userId: number) => {
+  getUserInfo = async (userId: number) => {
+    const user: User = await this.repo.findUserById(userId);
+    if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
+
+    return this.mapResponse(user);
+  };
+
+  // 내 정보 수정 - 패스워드
+  changePassword = async (data: ChangePasswordInput, userId: number) => {
     const user: User = await this.repo.findUserById(userId);
     if (!user) throw new CustomError(404, '사용자 확인이 필요합니다');
 
@@ -59,27 +59,17 @@ export class UserService {
       await this.repo.updateUserPassword(userId, hashedNewPassword);
     }
 
-    // 이미지가 있는 경우 이미지 업데이트
-    const profileImgUrl = data.profileImgUrl ?? null;
+    const userUpdate = await this.repo.findUserById(userId);
+    return this.mapResponse(userUpdate);
+  };
 
-    if (profileImgUrl) {
-      await this.repo.updateUserImg(userId, profileImgUrl);
-    }
+  // 내 정보 수정 - 이미지
+  updateProfileImage = async (profileImgUrl: string, userId: number) => {
+    // 이미지가 있는 경우 이미지 업데이트
+    await this.repo.updateUserImg(userId, profileImgUrl);
 
     const userUpdate = await this.repo.findUserById(userId);
-
-    const baseUrl = BASE_URL;
-
-    const { password: _, ...userWithoutPW } = userUpdate;
-
-    const userInfo = {
-      ...userWithoutPW,
-      profileImgUrl: userWithoutPW.profileImgUrl
-        ? `${baseUrl}${userWithoutPW.profileImgUrl}`
-        : null,
-    };
-
-    return userInfo;
+    return this.mapResponse(userUpdate);
   };
 
   // 참여 중인 프로젝트 조회

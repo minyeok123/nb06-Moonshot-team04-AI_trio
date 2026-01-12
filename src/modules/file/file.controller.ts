@@ -1,20 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { FileService } from './file.service';
+import { CustomError } from '../../libs/error';
 
 const fileService = new FileService();
 
 export class FileController {
   static upload = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: '파일이 없습니다.' });
-      }
-
-      res.status(201).json({
-        profileImage: req.file.path,
-      });
-    } catch (error) {
-      next(error);
+    if (!req.file) {
+      throw new CustomError(400, '파일이 존재하지 않습니다');
     }
+
+    const imgUrl = fileService.createFileUrl(req.file);
+
+    res.status(201).json([imgUrl]);
   };
 }

@@ -3,10 +3,12 @@ import { AuthRepo } from './auth.repo';
 import { AuthService } from './auth.service';
 import { generateState } from './utils/state';
 import { FRONTEND_URL } from '../../libs/constants';
+import { toRelativeUploadPath } from '../../libs/uploadPath';
 
 export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {
-    const data = { ...req.body, profileImgUrl: req.body.file ?? null };
+    const profileImgUrl = toRelativeUploadPath(req.body.profileImage);
+    const data = { ...req.body, profileImgUrl };
     const userWithoutPassword = await authService.register(data);
     res.status(201).json(userWithoutPassword);
   };

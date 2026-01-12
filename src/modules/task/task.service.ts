@@ -35,6 +35,7 @@ type UpdateTaskResult = {
   assignee: { id: number; name: string; email: string; profileImage: string | null } | null;
   tags: { id: number; name: string }[];
   attachments: string[];
+  subTasks: string[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -78,6 +79,12 @@ export class TaskService {
         name: twt.tags.tag,
       })),
       attachments: task!.files.map((f: any) => `${baseUrl}${f.url}`),
+      subTasks: (task.subTasks ?? []).map((st: any) => ({
+        id: st.id,
+        title: st.content,
+        taskId: st.taskId,
+        status: st.status,
+      })),
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };

@@ -1,6 +1,8 @@
 import express from 'express';
 import { FRONTEND_URL, PORT, SESSION_SECRET } from './libs/constants';
 import cors from 'cors';
+import path from 'path';
+
 import authRouter from './modules/auth/auth.router';
 import userRouter from './modules/user/user.router';
 import projectRouter from './modules/project/project.router';
@@ -38,19 +40,20 @@ app.use(
   }),
 );
 
-app.use('/tasks', taskRouter);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 app.use('/files', fileRouter);
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/projects', memberRouter);
 app.use('/projects', projectRouter);
 app.use('/invitations', invitationRouter);
+app.use('/tasks', taskRouter);
 app.use('/tasks', subtaskRouter);
 app.use('/tasks', commentRouter);
 app.use('/subtasks', subtasksRouter);
 app.use('/comments', commentRouter);
 app.use('/projects', taskRouter);
-app.use('/tasks', taskRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
