@@ -10,8 +10,6 @@ import {
   taskIdParamSchema,
   updateTaskBodySchema,
 } from './task.validator';
-import upload from '../../middlewares/upload';
-import { attachFilePath } from '../../middlewares/attachFilePath';
 
 const router = express.Router();
 
@@ -20,8 +18,6 @@ router.post(
   tokenValidate(),
   authenticate,
   Authorize.projectMember,
-  upload.array('attachments'),
-  attachFilePath,
   validate(taskValidator, 'body'),
   asyncHandler(TaskController.createTask),
 );
@@ -49,8 +45,6 @@ router.patch(
   tokenValidate(),
   authenticate,
   Authorize.taskOrSubtaskProjectMember,
-  upload.array('attachments'),
-  attachFilePath,
   validate(updateTaskBodySchema, 'body'),
   asyncHandler(TaskController.updateTask),
 );

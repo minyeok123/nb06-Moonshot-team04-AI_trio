@@ -3,10 +3,13 @@ import { z } from 'zod';
 export const userPasswordValidator = z.object({
   email: z.email(),
   name: z.string(),
-  profileImage: z.string().optional(),
   currentPassword: z.string().min(8).max(30),
   newPassword: z.string().min(8).max(30).optional(),
   checkNewPassword: z.string().min(8).max(30).optional(),
+});
+
+export const userProfileImageValidator = z.object({
+  profileImage: z.string(),
 });
 
 export const getMyProjectValidator = z.object({
