@@ -1,21 +1,21 @@
 import express from 'express';
-import { FRONTEND_URL, PORT, SESSION_SECRET } from './libs/constants';
+import session from 'express-session';
 import cors from 'cors';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import { FRONTEND_URL, PORT, SESSION_SECRET } from './libs/constants';
 
+import { defaultNotFoundHandler, globalErrorHandler } from './middlewares/errorHandler';
 import authRouter from './modules/auth/auth.router';
 import userRouter from './modules/user/user.router';
 import projectRouter from './modules/project/project.router';
-import { defaultNotFoundHandler, globalErrorHandler } from './middlewares/errorHandler';
 import memberRouter from './modules/member/member.router';
 import invitationRouter from './modules/invitation/invitation.router';
 import subtaskRouter from './modules/subtask/subtask.router';
 import subtasksRouter from './modules/subtask/subtasks.router';
 import commentRouter from './modules/comment/comment.router';
 import fileRouter from './modules/file/file.router';
-import session from 'express-session';
 import taskRouter from './modules/task/task.router';
 
 const app = express();
