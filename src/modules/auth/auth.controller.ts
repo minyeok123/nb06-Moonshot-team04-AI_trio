@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthRepo } from './auth.repo';
-import { AuthService } from './auth.service';
-import { generateState } from './utils/state';
-import { FRONTEND_URL } from '../../libs/constants';
-import { toRelativeUploadPath } from '../../libs/uploadPath';
+import { AuthRepo } from '@modules/auth/auth.repo';
+import { AuthService } from '@modules/auth/auth.service';
+import { generateState } from '@modules/auth/utils/state';
+import { FRONTEND_URL } from '@libs/constants';
+import { toRelativeUploadPath } from '@libs/uploadPath';
 
 export class AuthController {
   static register = async (req: Request, res: Response, next: NextFunction) => {

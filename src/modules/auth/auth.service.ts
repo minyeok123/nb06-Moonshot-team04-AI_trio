@@ -1,18 +1,18 @@
-import { AuthRepo } from './auth.repo';
+import axios from 'axios';
 import bcrypt from 'bcrypt';
-import type { User } from '../../types/user';
-import token from './utils/token';
-import { CustomError } from '../../libs/error';
-import { compareData, hashData } from './utils/hash';
+import { CustomError } from '@libs/error';
+import type { User } from '@app-types/user';
+import token from '@modules/auth/utils/token';
+import { encryptToken } from '@modules/auth/utils/crypt';
+import { AuthRepo } from '@modules/auth/auth.repo';
+import { compareData, hashData } from '@modules/auth/utils/hash';
 import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REDIRECT_URI,
   RESPONSE_TYPE,
   BASE_URL,
-} from '../../libs/constants';
-import axios from 'axios';
-import { encryptToken } from './utils/crypt';
+} from '@libs/constants';
 
 type RegisterData = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & { password: string };
 type ResponseUser = Pick<User, 'id' | 'email' | 'name' | 'createdAt' | 'updatedAt'> & {

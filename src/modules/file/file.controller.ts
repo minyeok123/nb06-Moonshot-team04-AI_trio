@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { FileService } from './file.service';
-import { CustomError } from '../../libs/error';
+import { FileService } from '@modules/file/file.service';
+import { CustomError } from '@libs/error';
 
 const fileService = new FileService();
 

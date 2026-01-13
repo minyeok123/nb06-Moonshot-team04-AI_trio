@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../libs/constants';
+import { BASE_URL } from '@libs/constants';
 
 export class FileService {
   createFileUrl = (file: Express.Multer.File) => {
