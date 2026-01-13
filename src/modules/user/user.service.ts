@@ -54,14 +54,10 @@ export class UserService {
 
     // 비밀번호가 있는 경우 비밀번호 업데이트
     const newPassword = data.newPassword;
-    const checkNewPassword = data.checkNewPassword;
 
-    if (oldPassword && newPassword && checkNewPassword) {
+    if (oldPassword && newPassword) {
       if (oldPassword === newPassword)
         throw new CustomError(400, '기존 비밀번호와 신규 비밀번호가 같습니다');
-
-      if (newPassword !== checkNewPassword)
-        throw new CustomError(400, '신규 비밀번호와 신규확인 비밀번호가 다릅니다');
 
       const salt = await bcrypt.genSalt(10);
       const hashedNewPassword = await bcrypt.hash(newPassword, salt);
