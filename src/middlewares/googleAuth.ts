@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomError } from '../libs/error';
+import { CustomError } from '@libs/error';
 
 export async function verifyState(req: Request, res: Response, next: NextFunction) {
   try {

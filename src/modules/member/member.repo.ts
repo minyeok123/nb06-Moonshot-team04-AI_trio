@@ -1,4 +1,4 @@
-import { prisma } from '../../libs/prisma';
+import { prisma } from '@libs/prisma';
 
 export class MemberRepo {
   findMembersByProjectId = async (projectId: number, skip: number, take: number) => {

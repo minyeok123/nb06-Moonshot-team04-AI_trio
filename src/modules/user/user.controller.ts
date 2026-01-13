@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserService } from './user.service';
-import { UserRepo } from './user.repo';
-import { toRelativeUploadPath } from '../../libs/uploadPath';
-import { changePasswordValidator, userProfileImageValidator } from './user.validator';
+import { toRelativeUploadPath } from '@libs/uploadPath';
+import { UserService } from '@modules/user/user.service';
+import { UserRepo } from '@modules/user/user.repo';
+import { changePasswordValidator, userProfileImageValidator } from '@modules/user/user.validator';
 
 const userRepo = new UserRepo();
 const userService = new UserService(userRepo);

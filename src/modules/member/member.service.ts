@@ -1,5 +1,5 @@
-import { CustomError } from '../../libs/error';
-import { MemberRepo } from './member.repo';
+import { CustomError } from '@libs/error';
+import { MemberRepo } from '@modules/member/member.repo';
 
 export class MemberService {
   constructor(private repo: MemberRepo) {}

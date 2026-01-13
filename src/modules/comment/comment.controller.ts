@@ -1,6 +1,6 @@
-import { CommentRepo } from './comment.repo';
-import { CommentService } from './comment.service';
 import { NextFunction, Request, Response } from 'express';
+import { CommentRepo } from '@modules/comment/comment.repo';
+import { CommentService } from '@modules/comment/comment.service';
 
 export class CommentController {
   static createComment = async (req: Request, res: Response, next: NextFunction) => {

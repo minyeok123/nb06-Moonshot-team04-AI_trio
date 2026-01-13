@@ -1,6 +1,6 @@
 import z, { ZodType } from 'zod';
 import { Request, Response, NextFunction } from 'express';
-import { CustomError } from '../libs/error';
+import { CustomError } from '@libs/error';
 
 export function validate(schema: ZodType, source: 'body' | 'params' | 'query' = 'body') {
   return (req: Request, res: Response, next: NextFunction) => {

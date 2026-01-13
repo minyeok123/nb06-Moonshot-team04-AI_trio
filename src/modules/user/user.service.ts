@@ -1,8 +1,8 @@
-import { User } from '../../types/user';
-import { UserRepo } from './user.repo';
 import bcrypt from 'bcrypt';
-import { CustomError } from '../../libs/error';
-import { BASE_URL } from '../../libs/constants';
+import { User } from '@app-types/user';
+import { CustomError } from '@libs/error';
+import { BASE_URL } from '@libs/constants';
+import { UserRepo } from '@modules/user/user.repo';
 
 type ChangePasswordInput = {
   currentPassword: string;

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { CustomError } from '../libs/error';
-import { prisma } from '../libs/prisma';
-import { compareData } from '../modules/auth/utils/hash';
-import Token from '../modules/auth/utils/token';
+import { CustomError } from '@libs/error';
+import { prisma } from '@libs/prisma';
+import { compareData } from '@modules/auth/utils/hash';
+import Token from '@modules/auth/utils/token';
 
 export const authenticateRefresh = async (req: Request, res: Response, next: NextFunction) => {
   const parseTokenFromHeader = (req: Request) => {

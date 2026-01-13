@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { MemberRepo } from './member.repo';
-import { MemberService } from './member.service';
+import { MemberRepo } from '@modules/member/member.repo';
+import { MemberService } from '@modules/member/member.service';
 
 export class MemberController {
   static getMembers = async (req: Request, res: Response, next: NextFunction) => {

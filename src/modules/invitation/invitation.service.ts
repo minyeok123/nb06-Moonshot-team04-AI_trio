@@ -1,6 +1,6 @@
-import { CustomError } from '../../libs/error';
-import { prisma } from '../../libs/prisma';
-import { InvitationRepo } from './invitation.repo';
+import { CustomError } from '@libs/error';
+import { prisma } from '@libs/prisma';
+import { InvitationRepo } from '@modules/invitation/invitation.repo';
 
 export class InvitationService {
   constructor(private repo: InvitationRepo) {}

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { CRYPTO_SECRET_KEY } from '../../../libs/constants';
+import { CRYPTO_SECRET_KEY } from '@libs/constants';
 
 const ALGO = 'aes-256-gcm';
 const KEY = Buffer.from(CRYPTO_SECRET_KEY!, 'hex');

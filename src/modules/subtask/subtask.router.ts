@@ -1,10 +1,10 @@
 import express from 'express';
-import { tokenValidate, validate } from '../../middlewares/validate';
-import authenticate from '../../middlewares/authenticate';
-import { SubtaskController } from './subtask.controller';
-import asyncHandler from '../../libs/asyncHandler';
-import { createSubtaskBodySchema, taskIdParamsSchema } from './subtask.validator';
-import { Authorize } from '../../middlewares/authorize';
+import asyncHandler from '@libs/asyncHandler';
+import { tokenValidate, validate } from '@middlewares/validate';
+import authenticate from '@middlewares/authenticate';
+import { Authorize } from '@middlewares/authorize';
+import { SubtaskController } from '@modules/subtask/subtask.controller';
+import { createSubtaskBodySchema, taskIdParamsSchema } from '@modules/subtask/subtask.validator';
 
 const router = express.Router();
 

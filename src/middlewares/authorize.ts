@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { MemberRepo } from '../modules/member/member.repo';
-import { prisma } from '../libs/prisma';
-import { CustomError } from '../libs/error';
+import { prisma } from '@libs/prisma';
+import { CustomError } from '@libs/error';
+import { MemberRepo } from '@modules/member/member.repo';
 
 export class Authorize {
   static projectOwner = async (req: Request, res: Response, next: NextFunction) => {

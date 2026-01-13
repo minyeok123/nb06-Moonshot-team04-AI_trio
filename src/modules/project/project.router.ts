@@ -1,10 +1,14 @@
 import express from 'express';
-import { ProjectController } from './project.controller';
-import asyncHandler from '../../libs/asyncHandler';
-import { tokenValidate, validate } from '../../middlewares/validate';
-import { CreateProject, paramsSchema, PatchProjectSchema } from './project.validator';
-import authenticate from '../../middlewares/authenticate';
-import { Authorize } from '../../middlewares/authorize';
+import asyncHandler from '@libs/asyncHandler';
+import { tokenValidate, validate } from '@middlewares/validate';
+import authenticate from '@middlewares/authenticate';
+import { Authorize } from '@middlewares/authorize';
+import { ProjectController } from '@modules/project/project.controller';
+import {
+  CreateProject,
+  paramsSchema,
+  PatchProjectSchema,
+} from '@modules/project/project.validator';
 
 // Project 전체 분류 - 전역 선언 영역
 /**

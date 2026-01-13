@@ -1,5 +1,5 @@
-import { CustomError } from '../../libs/error';
-import { SubtaskRepo } from './subtask.repo';
+import { CustomError } from '@libs/error';
+import { SubtaskRepo } from '@modules/subtask/subtask.repo';
 
 export class SubtaskService {
   constructor(private repo: SubtaskRepo) {}

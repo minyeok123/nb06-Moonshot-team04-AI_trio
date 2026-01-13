@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { SubtaskRepo } from './subtask.repo';
-import { SubtaskService } from './subtask.service';
+import { SubtaskRepo } from '@modules/subtask/subtask.repo';
+import { SubtaskService } from '@modules/subtask/subtask.service';
 
 export class SubtaskController {
   static createSubtask = async (req: Request, res: Response, next: NextFunction) => {

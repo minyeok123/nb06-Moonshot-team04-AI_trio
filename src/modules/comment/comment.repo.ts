@@ -1,5 +1,5 @@
-import { prisma } from '../../libs/prisma';
 import { Prisma } from '@prisma/client';
+import { prisma } from '@libs/prisma';
 
 export class CommentRepo {
   private readonly selectOptions = {

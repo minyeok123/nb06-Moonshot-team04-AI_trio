@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { JWT_REFRESH_SECRET, JWT_SECRET } from '../../../libs/constants';
-import { CustomError } from '../../../libs/error';
+import { JWT_REFRESH_SECRET, JWT_SECRET } from '@libs/constants';
+import { CustomError } from '@libs/error';
 
 interface tokenPayloadUserid {
   id: number;

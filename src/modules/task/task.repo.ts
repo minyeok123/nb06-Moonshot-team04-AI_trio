@@ -1,4 +1,4 @@
-import { prisma } from '../../libs/prisma';
+import { prisma } from '@libs/prisma';
 
 type Order = 'asc' | 'desc';
 type OrderBy = 'created_at' | 'name' | 'end_date';

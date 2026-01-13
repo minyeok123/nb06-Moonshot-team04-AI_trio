@@ -1,7 +1,7 @@
-import { CommentRepo } from './comment.repo';
-import { CustomError } from '../../libs/error';
-import { Comment } from '../../types/comment';
-import { mapResponse } from './dto/comment.dto';
+import { CommentRepo } from '@modules/comment/comment.repo';
+import { CustomError } from '@libs/error';
+import { Comment } from '@app-types/comment';
+import { mapResponse } from '@modules/comment/dto/comment.dto';
 
 type CreateComment = Pick<Comment, 'content'>;
 

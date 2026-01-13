@@ -1,8 +1,8 @@
-import { ProjectRepo } from './project.repo';
-import { Project } from '../../types/project';
-import { CustomError } from '../../libs/error';
-import { mapStatusCount } from './utils/project.mapper';
-import { mapResponse } from './dto/project.dto';
+import { Project } from '@app-types/project';
+import { CustomError } from '@libs/error';
+import { ProjectRepo } from '@modules/project/project.repo';
+import { mapStatusCount } from '@modules/project/utils/project.mapper';
+import { mapResponse } from '@modules/project/dto/project.dto';
 
 type CreateProject = Pick<Project, 'description'> & { name: string };
 type PatchProject = Partial<CreateProject>;
