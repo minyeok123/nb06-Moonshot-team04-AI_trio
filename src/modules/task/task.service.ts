@@ -4,6 +4,7 @@ import { TaskStatus } from '@prisma/client';
 import { BASE_URL } from '../../libs/constants';
 import { getGoogleAccessTokenFromRefresh } from './google/token';
 import { GoogleCalendar } from './google/googleCalendar';
+import { toRelativeUploadPath } from '../../libs/uploadPath';
 
 type updateTaskBody = {
   title: string;
@@ -114,7 +115,10 @@ export class TaskService {
     }
 
     if (data.attachments.length > 0) {
-      await this.repo.createFiles(task.id, data.attachments);
+      const attachments = data.attachments
+        .map(toRelativeUploadPath)
+        .filter((v): v is string => v !== null);
+      await this.repo.createFiles(task.id, attachments);
     }
 
     const createTask = await this.repo.findTaskWithRelations(task.id);
@@ -196,7 +200,11 @@ export class TaskService {
     await this.repo.upsertTags(normalizedTags, taskId);
 
     // 3. task에 연동 된 file 수정
-    await this.repo.replaceTaskFiles(taskId, data.attachments ?? []);
+    const attachments = data.attachments
+      .map(toRelativeUploadPath)
+      .filter((v): v is string => v !== null);
+
+    await this.repo.replaceTaskFiles(taskId, attachments ?? []);
 
     // 모든 작업이 마친 뒤 업데이트 된 정보 불러오기
     const updated = await this.repo.findTaskWithRelations(taskId);
