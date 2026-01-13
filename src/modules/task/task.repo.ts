@@ -8,6 +8,7 @@ export class TaskRepo {
     userId: number;
     projectId: number;
     title: string;
+    description: string;
     status: 'todo' | 'in_progress' | 'done';
     startDate: Date;
     endDate: Date;

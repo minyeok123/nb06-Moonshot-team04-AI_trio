@@ -14,6 +14,10 @@ export class AuthRepo {
     return await prisma.user.findUnique(option);
   };
 
+  getRefresh = async (userId: number) => {
+    return await prisma.user.findUnique({ where: { id: userId }, include: { refreshToken: true } });
+  };
+
   saveRefresh = async (refreshToken: string, userId: number, expiresAt: Date) => {
     return await prisma.refreshToken.upsert({
       where: { userId },

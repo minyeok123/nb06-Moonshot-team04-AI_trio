@@ -73,6 +73,9 @@ export class AuthService {
   };
 
   refresh = async (userId: number) => {
+    const savedRefresh = await this.repo.getRefresh(userId);
+    if (savedRefresh?.refreshToken && savedRefresh?.refreshToken?.expiresAt < new Date())
+      throw new CustomError(401, '토큰 만료');
     const { accessToken, refreshToken } = token.createTokens(userId);
     const { id, exp } = token.verifyRefreshToken(refreshToken);
     const expiresAt = new Date(exp! * 1000);
