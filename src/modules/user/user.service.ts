@@ -14,9 +14,10 @@ export class UserService {
   constructor(private repo: UserRepo) {}
 
   mapResponse = (user: any): User => {
+    const baseUrl = BASE_URL;
+
     const { password: _, ...userWithoutPW } = user;
     const profileImgUrl = userWithoutPW.profileImgUrl;
-    const baseUrl = BASE_URL;
     let profileImage: string | null = null;
 
     if (profileImgUrl) {
@@ -25,12 +26,6 @@ export class UserService {
       } else {
         profileImage = `${baseUrl}${profileImgUrl}`;
       }
-    }
-
-    let dbImg = userWithoutPW.profileImgUrl;
-
-    if (dbImg && !dbImg.startsWith('http')) {
-      dbImg = `${BASE_URL}${userWithoutPW.profileImgUrl}`;
     }
 
     return {
