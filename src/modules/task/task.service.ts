@@ -102,6 +102,7 @@ export class TaskService {
       userId,
       projectId,
       title: data.title,
+      description: data.description || '',
       status: data.status,
       startDate,
       endDate,
