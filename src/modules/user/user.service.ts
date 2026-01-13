@@ -17,10 +17,20 @@ export class UserService {
     const baseUrl = BASE_URL;
 
     const { password: _, ...userWithoutPW } = user;
+    const profileImgUrl = userWithoutPW.profileImgUrl;
+    let profileImage: string | null = null;
+
+    if (profileImgUrl) {
+      if (profileImgUrl.startsWith('http')) {
+        profileImage = profileImgUrl;
+      } else {
+        profileImage = `${baseUrl}${profileImgUrl}`;
+      }
+    }
 
     return {
       ...userWithoutPW,
-      profileImage: userWithoutPW.profileImgUrl ? `${baseUrl}${userWithoutPW.profileImgUrl}` : null,
+      profileImage,
     };
   };
 
