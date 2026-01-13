@@ -39,7 +39,11 @@ const options = {
 
 const specs = swaggerJSDoc(options);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { swaggerOptions: { supportedSubmitMethods: [] } }),
+);
 
 app.use(
   cors({
