@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2016", // 2016년 ECMAScript 표준
+    "module": "CommonJS", // Node 환경
+    "rootDir": "./src", // 소스 파일 위치
+    "outDir": "./dist", // 컴파일 결과 위치
+    "strict": true, // 타입 체크 강화
+    "esModuleInterop": true, // import 호환
+    "moduleResolution": "node", // Node 모듈 해석
+    "resolveJsonModule": true, // JSON import 허용
+    "typeRoots": ["./src/types", "./node_modules/@types"], // 커스텀 타입 정의 포함
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@libs/*": ["src/libs/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@modules/*": ["src/modules/*"],
+      "@app-types/*": ["src/types/*"] // 기존 @types 와 겹쳐서 이름 별도 지정
+      // 예시) import asyncHandler from '@libs/asyncHandler';
+      // 예시) import authenticate from '@middlewares/authenticate';
+      // 예시) import { AuthController } from '@modules/auth/auth.controller';
+      // 예시) import authenticate from '@app-types/comment';
+    }
+  },
+  "include": ["src"], // 컴파일할 폴더
+  "exclude": ["node_modules", "dist"] // 제외할 폴더
+}

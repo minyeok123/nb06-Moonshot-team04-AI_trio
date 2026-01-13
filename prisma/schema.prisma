@@ -1,0 +1,211 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int             @id @default(autoincrement())
+  email            String          @unique
+  password         String?
+  name             String
+  profileImgUrl    String?         @map("profile_img_url")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  projects         Project[]
+  projectMembers   ProjectMember[]
+  tasks            Task[]
+  comments         Comment[]
+  oauths           Oauth[]
+  refreshToken     RefreshToken?
+  invitations      Invitation[]    @relation("InvitationReceiver")
+  ownerInvitations Invitation[]    @relation("InvitationOwner")
+
+  @@map("users")
+}
+
+model Project {
+  id             Int             @id @default(autoincrement())
+  projectName    String          @map("project_name")
+  description    String
+  ownerId        Int             @map("owner_id")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  users          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  projectMembers ProjectMember[]
+  invitations    Invitation[]
+  tasks          Task[]
+
+  @@unique([id, ownerId])
+  @@map("projects")
+}
+
+model Invitation {
+  id               Int              @id @default(autoincrement())
+  sendUserId       Int              @map("send_user_id")
+  receiveUserId    Int              @map("receive_user_id")
+  projectId        Int              @map("project_id")
+  invitationStatus InvitationStatus @default(pending) @map("invitation_status")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  users            User             @relation("InvitationReceiver", fields: [receiveUserId], references: [id], onDelete: Cascade)
+  project          Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner            User             @relation("InvitationOwner", fields: [sendUserId], references: [id], onDelete: Cascade)
+  projectMember    ProjectMember?
+
+  @@map("invitations")
+}
+
+model ProjectMember {
+  userId            Int          @map("user_id")
+  projectId         Int          @map("project_id")
+  role              Role         @default(member)
+  joinedAt          DateTime     @default(now()) @map("joined_at")
+  invitationId      Int?         @unique @map("invitation_id")
+  memberStatus      MemberStatus @default(accepted) @map("member_status")
+  users             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects          Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectInvitation Invitation?  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@map("project_members")
+}
+
+model Task {
+  id           Int            @id @default(autoincrement())
+  calendarId   String?        @map("calendar_id")
+  userId       Int            @map("user_id")
+  projectId    Int            @map("project_id")
+  title        String
+  description  String?
+  status       TaskStatus     @default(todo)
+  startDate    DateTime       @map("start_date")
+  endDate      DateTime       @map("end_date")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  users        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  subTasks     SubTask[]
+  comments     Comment[]
+  taskWithTags TaskWithTags[]
+  files        File[]
+
+  @@map("tasks")
+}
+
+model SubTask {
+  id        Int        @id @default(autoincrement())
+  taskId    Int        @map("task_id")
+  content   String
+  status    TaskStatus @default(todo)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  tasks     Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("sub_tasks")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int      @map("task_id")
+  userId    Int      @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  users     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Tag {
+  id           Int            @id @default(autoincrement())
+  tag          String         @unique
+  createdAt    DateTime       @default(now()) @map("created_at")
+  taskWithTags TaskWithTags[]
+
+  @@map("tags")
+}
+
+model TaskWithTags {
+  tagId     Int      @map("tag_id")
+  taskId    Int      @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  tags      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tasks     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([tagId, taskId])
+  @@map("task_with_tags")
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  taskId    Int      @map("task_id")
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+  tasks     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("files")
+}
+
+model Oauth {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  provider     Provider @default(local)
+  providerId   String   @map("provider_id")
+  refreshToken String   @map("refresh_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  expirationAt DateTime @map("expires_at")
+  users        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("oauths")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
+
+enum Provider {
+  google
+  local
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  done
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  rejected
+}
+
+enum Role {
+  owner
+  member
+}
+
+enum MemberStatus {
+  accepted
+  rejected
+}
