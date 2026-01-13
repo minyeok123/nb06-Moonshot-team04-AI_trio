@@ -43,7 +43,7 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/commentPost'
+ *             $ref: '#/components/schemas/commentRequestBody'
  *     responses:
  *       200:
  *         description: 댓글 등록 성공
@@ -54,9 +54,9 @@ const router = express.Router();
  *       400:
  *         description: "message : 잘못된 요청 형식"
  *       401:
- *         description: "로그인이 필요합니다"
+ *         description: "message : 로그인이 필요합니다"
  *       403:
- *         description: "프로젝트 멤버가 아닙니다"
+ *         description: "message : 프로젝트 멤버가 아닙니다"
  */
 
 /**
@@ -173,7 +173,7 @@ router
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/commentPost'
+ *             $ref: '#/components/schemas/commentRequestBody'
  *     responses:
  *       200:
  *         description: 댓글 수정 성공
@@ -286,7 +286,7 @@ export default router;
  *       scheme: bearer
  *       bearerFormat: JWT
  *   schemas:
- *     commentPost:
+ *     commentRequestBody:
  *       type: object
  *       required: [ content ]
  *       properties:
