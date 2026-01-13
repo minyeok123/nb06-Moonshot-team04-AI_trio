@@ -1,4 +1,4 @@
-import { UserInfo } from '../user';
+import { UserInfo } from '@app-types/user';
 
 declare global {
   namespace Express {

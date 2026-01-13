@@ -1,10 +1,10 @@
 import express from 'express';
-import { InvitationController } from './invitation.controller';
-import { tokenValidate, validate } from '../../middlewares/validate';
-import { invitationIdParamsSchema } from './invitation.validator';
-import authenticate from '../../middlewares/authenticate';
-import asyncHandler from '../../libs/asyncHandler';
-import { Authorize } from '../../middlewares/authorize';
+import asyncHandler from '@libs/asyncHandler';
+import authenticate from '@middlewares/authenticate';
+import { tokenValidate, validate } from '@middlewares/validate';
+import { Authorize } from '@middlewares/authorize';
+import { invitationIdParamsSchema } from '@modules/invitation/invitation.validator';
+import { InvitationController } from '@modules/invitation/invitation.controller';
 
 const router = express.Router();
 

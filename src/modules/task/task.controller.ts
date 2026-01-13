@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { TaskService } from './task.service';
-import { TaskRepo } from './task.repo';
+import { TaskService } from '@modules/task/task.service';
+import { TaskRepo } from '@modules/task/task.repo';
 
 const taskRepo = new TaskRepo();
 const taskService = new TaskService(taskRepo);

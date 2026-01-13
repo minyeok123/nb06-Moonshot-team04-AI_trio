@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { ProjectRepo } from './project.repo';
-import { ProjectService } from './project.service';
+import { ProjectRepo } from '@modules/project/project.repo';
+import { ProjectService } from '@modules/project/project.service';
 
 export class ProjectController {
   static createProject = async (req: Request, res: Response, next: NextFunction) => {

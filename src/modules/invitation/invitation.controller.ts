@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { InvitationRepo } from './invitation.repo';
-import { InvitationService } from './invitation.service';
+import { InvitationRepo } from '@modules/invitation/invitation.repo';
+import { InvitationService } from '@modules/invitation/invitation.service';
 
 export class InvitationController {
   static acceptInvitation = async (req: Request, res: Response, next: NextFunction) => {

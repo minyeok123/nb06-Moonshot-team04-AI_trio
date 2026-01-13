@@ -1,16 +1,16 @@
 import express from 'express';
-import { MemberController } from './member.controller';
-import { tokenValidate, validate } from '../../middlewares/validate';
+import asyncHandler from '@libs/asyncHandler';
+import authenticate from '@middlewares/authenticate';
+import { tokenValidate, validate } from '@middlewares/validate';
+import { Authorize } from '@middlewares/authorize';
+import { MemberController } from '@modules/member/member.controller';
 import {
   getMemberParamsSchema,
   getMemberQuerySchema,
   deleteMemberParamsSchema,
   createMemberParamsSchema,
   createMemberBodySchema,
-} from './member.validator';
-import authenticate from '../../middlewares/authenticate';
-import { Authorize } from '../../middlewares/authorize';
-import asyncHandler from '../../libs/asyncHandler';
+} from '@modules/member/member.validator';
 
 const router = express.Router();
 // tokenValidate,

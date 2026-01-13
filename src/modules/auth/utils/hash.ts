@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { SALT_ROUNDS } from '../../../libs/constants';
+import { SALT_ROUNDS } from '@libs/constants';
 
 export async function hashData(data: string) {
   return await bcrypt.hash(data, SALT_ROUNDS!);

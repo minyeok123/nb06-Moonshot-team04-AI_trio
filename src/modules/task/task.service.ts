@@ -1,10 +1,10 @@
-import { TaskRepo } from './task.repo';
-import { CustomError } from '../../libs/error';
 import { TaskStatus } from '@prisma/client';
-import { BASE_URL } from '../../libs/constants';
-import { getGoogleAccessTokenFromRefresh } from './google/token';
-import { GoogleCalendar } from './google/googleCalendar';
-import { toRelativeUploadPath } from '../../libs/uploadPath';
+import { CustomError } from '@libs/error';
+import { BASE_URL } from '@libs/constants';
+import { toRelativeUploadPath } from '@libs/uploadPath';
+import { TaskRepo } from '@modules/task/task.repo';
+import { GoogleCalendar } from '@modules/task/google/googleCalendar';
+import { getGoogleAccessTokenFromRefresh } from '@modules/task/google/token';
 
 type updateTaskBody = {
   title: string;

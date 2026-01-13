@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { CustomError } from '../libs/error';
+import { CustomError } from '@libs/error';
 
 export function defaultNotFoundHandler(req: Request, res: Response, next: NextFunction) {
   return res.status(404).send({ message: '잘못된 접근입니다.' });

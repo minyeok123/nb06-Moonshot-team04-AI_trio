@@ -1,15 +1,15 @@
 import express from 'express';
-import { TaskController } from './task.controller';
-import authenticate from '../../middlewares/authenticate';
-import { Authorize } from '../../middlewares/authorize';
-import asyncHandler from '../../libs/asyncHandler';
-import { validate, tokenValidate } from '../../middlewares/validate';
+import asyncHandler from '@libs/asyncHandler';
+import authenticate from '@middlewares/authenticate';
+import { Authorize } from '@middlewares/authorize';
+import { validate, tokenValidate } from '@middlewares/validate';
+import { TaskController } from '@modules/task/task.controller';
 import {
   taskValidator,
   listTaskQuerySchema,
   taskIdParamSchema,
   updateTaskBodySchema,
-} from './task.validator';
+} from '@modules/task/task.validator';
 
 // TASK 전체 분류 - 전역 선언 영역
 /**

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { CustomError } from '../../../libs/error';
-import { decryptToken } from '../../auth/utils/crypt';
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '../../../libs/constants';
-import { prisma } from '../../../libs/prisma';
+import { prisma } from '@libs/prisma';
+import { CustomError } from '@libs/error';
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '@libs/constants';
+import { decryptToken } from '@modules/auth/utils/crypt';
 
 export const getGoogleAccessTokenFromRefresh = async (userId: number) => {
   const getDbToken = await getGoogleRefreshToken(userId);

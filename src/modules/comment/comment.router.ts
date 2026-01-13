@@ -1,16 +1,16 @@
 import express from 'express';
-import asyncHandler from '../../libs/asyncHandler';
-import authenticate from '../../middlewares/authenticate';
-import { Authorize } from '../../middlewares/authorize';
-import { CommentController } from './comment.controller';
-import { tokenValidate, validate } from '../../middlewares/validate';
+import asyncHandler from '@libs/asyncHandler';
+import authenticate from '@middlewares/authenticate';
+import { Authorize } from '@middlewares/authorize';
+import { tokenValidate, validate } from '@middlewares/validate';
+import { CommentController } from '@modules/comment/comment.controller';
 import {
   CommentIdParamsSchema,
   CommentQuerySchema,
   CreateCommentSchema,
   PatchCommentSchema,
   TaskIdParamsSchema,
-} from './comment.validate';
+} from '@modules/comment/comment.validate';
 
 // Comment 전체 분류 - 전역 선언 영역
 /**

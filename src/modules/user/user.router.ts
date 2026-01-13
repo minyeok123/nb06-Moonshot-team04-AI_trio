@@ -1,9 +1,9 @@
 import express from 'express';
-import { UserController } from './user.controller';
-import authenticate from '../../middlewares/authenticate';
-import asyncHandler from '../../libs/asyncHandler';
-import { validate, tokenValidate } from '../../middlewares/validate';
-import { getMyProjectValidator, getMyTaskValidator } from './user.validator';
+import asyncHandler from '@libs/asyncHandler';
+import authenticate from '@middlewares/authenticate';
+import { validate, tokenValidate } from '@middlewares/validate';
+import { UserController } from '@modules/user/user.controller';
+import { getMyProjectValidator, getMyTaskValidator } from '@modules/user/user.validator';
 
 // USER 전체 분류 - 전역 선언 영역
 /**
