@@ -97,9 +97,9 @@ router.post(
  *             schema:
  *                 $ref: '#/components/schemas/LoginToken'
  *       400:
- *         description: 잘못된 요청입니다
+ *         description: "message : 잘못된 요청입니다"
  *       404:
- *         description: 존재하지 않거나 비밀번호가 일치하지 않습니다
+ *         description: "message : 존재하지 않거나 비밀번호가 일치하지 않습니다"
  */
 router.post('/login', validate(loginBodySchema, 'body'), asyncHandler(AuthController.login));
 
@@ -119,9 +119,9 @@ router.post('/login', validate(loginBodySchema, 'body'), asyncHandler(AuthContro
  *             schema:
  *               $ref: '#/components/schemas/LoginToken'
  *       400:
- *         description: 잘못된 요청입니다
+ *         description: "message : 잘못된 요청입니다"
  *       401:
- *         description: 토큰 만료
+ *         description: "message : 토큰 만료"
  */
 // security : Authorization 헤더가 필요 한 경우 "인증 필요"를 표기한 것
 router.post('/refresh', authenticateRefresh, asyncHandler(AuthController.refresh));
