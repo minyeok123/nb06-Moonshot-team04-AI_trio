@@ -211,11 +211,11 @@ export default router;
  *           example: 1
  *         todoCount:
  *           type: integer
- *           example: 1
+ *           example: 0
  *         inProgressCount:
  *           type: integer
- *           example: 1
+ *           example: 0
  *         doneCount:
  *           type: integer
- *           example: 1
+ *           example: 0
  */

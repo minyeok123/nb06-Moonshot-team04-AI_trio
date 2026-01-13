@@ -36,11 +36,8 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 file:
- *                   type: string
- *                   example: "/uploads/profileImage.jpg"
+ *                 type: string
+ *                 example: "/uploads/profileImage.jpg"
  *       400:
  *         description: 파일이 존재하지 않습니다
  */
