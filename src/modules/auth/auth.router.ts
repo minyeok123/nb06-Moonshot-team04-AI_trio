@@ -2,7 +2,7 @@ import express from 'express';
 import asyncHandler from '@libs/asyncHandler';
 import { authenticateRefresh } from '@middlewares/authenticate.refresh';
 import { verifyState } from '@middlewares/googleAuth';
-import { validate } from '@middlewares/validate';
+import { tokenValidate, validate } from '@middlewares/validate';
 import { loginBodySchema, registerBodySchema } from '@modules/auth/auth.validator';
 import { AuthController } from '@modules/auth/auth.controller';
 
@@ -124,7 +124,7 @@ router.post('/login', validate(loginBodySchema, 'body'), asyncHandler(AuthContro
  *         description: "message : 토큰 만료"
  */
 // security : Authorization 헤더가 필요 한 경우 "인증 필요"를 표기한 것
-router.post('/refresh', authenticateRefresh, asyncHandler(AuthController.refresh));
+router.post('/refresh', tokenValidate(), authenticateRefresh, asyncHandler(AuthController.refresh));
 
 /**
  * @swagger

@@ -28,7 +28,16 @@ export const authenticateRefresh = async (req: Request, res: Response, next: Nex
 
     req.refresh = { id: payload.id };
     next();
-  } catch (e) {
+  } catch (e: any) {
+    if (e.name === 'TokenExpiredError') {
+      next(new CustomError(401, '토큰 만료'));
+      return;
+    }
+
+    if (e.name === 'JsonWebTokenError') {
+      next(new CustomError(401, '유효하지 않은 토큰'));
+      return;
+    }
     next(e);
   }
 };
