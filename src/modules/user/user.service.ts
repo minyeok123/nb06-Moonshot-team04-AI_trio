@@ -16,11 +16,10 @@ export class UserService {
   mapResponse = (user: any): User => {
     const baseUrl = BASE_URL;
 
-    const { password: _, ...userWithoutPW } = user;
-    const profileImgUrl = userWithoutPW.profileImgUrl;
+    const { password: _, profileImgUrl, ...userWithoutPW } = user;
     let profileImage: string | null = null;
 
-    if (profileImgUrl) {
+    if (profileImgUrl !== null) {
       if (profileImgUrl.startsWith('http')) {
         profileImage = profileImgUrl;
       } else {
