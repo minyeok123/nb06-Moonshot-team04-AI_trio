@@ -37,18 +37,18 @@ export class AuthController {
     const { accessToken, refreshToken } = (await authService.googleLoginByGoogleInfo(
       String(code),
     )) as { accessToken: string; refreshToken: string };
-
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('access-token', accessToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 60 * 60 * 1000,
     });
 
     res.cookie('refresh-token', refreshToken, {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
