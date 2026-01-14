@@ -63,7 +63,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      sameSite: isProd ? 'lax' : 'none',
     },
   }),
 );
