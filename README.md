@@ -1,6 +1,7 @@
 # **{Team04-AI_trio}**
 
-[협업 문서 링크](https://github.com/minyeok123/nb06-Moonshot-team04-AI_trio)
+[협업 문서 링크 - github](https://github.com/minyeok123/nb06-Moonshot-team04-AI_trio) <br>
+[협업 문서 링크 - notion](https://www.notion.so/Team-Project-2ce61538a9e2806ba419d21e4473dc06?source=copy_link)
 
 ## **팀원 구성**
 
@@ -27,30 +28,66 @@
 
 ## **팀원별 구현 기능 상세**
 
-### 김지선
+### 공통
 
 - Auth API
-  - 로그인 및 토큰 생성
+  - POST : 회원가입
+  - POST : 로그인 및 토큰 생성
+  - POST : 토큰 갱신(리프레시 토큰)
+  - GET : Google Oauth 연동 & 콜백
+
+### 김지선
+
 - User API
-  - GET : 자신의 정보 확인
+
+  - GET : 내 정보 조회
+  - PATCH : 내 정보 수정
+  - GET : 참여 중인 프로젝트 조회
+  - GET : 참여 중인 모든 프로젝트의 할 일 목록 조회
+
 - Task API
-  - (추후 작업 내용 작성)
+
+  - POST : 프로젝트에 할 일 생성
+  - GET : 프로젝트의 할 일 목록 조회
+  - GET : 할 일 조회
+  - PATCH : 할 일 수정
+  - DELETE : 할 일 삭제
+
+- Files API
+  - POST : 파일 업로드
 
 ### 김민혁
 
-- Auth API
-  - 회원가입
 - Project API
-  - (추후 작업 내용 작성)
+
+  - POST : 프로젝트 생성
+  - GET : 프로젝트 조회
+  - PATCH : 프로젝트 수정
+  - DELETE : 프로젝트 삭제
+
 - Comment API
-  - (추후 작업 내용 작성)
+  - POST : 할 일에 댓글 추가
+  - GET : 할 일에 달린 댓글 조회
+  - GET : 댓글 조회
+  - PATCH : 댓글 수정
+  - DELETE : 댓글 삭제
 
 ### 오윤
 
 - Member API
-  - (추후 작업 내용 작성)
+
+  - GET : 프로젝트 멤버 조회
+  - DELETE : 프로젝트에서 유저 제외하기
+  - POST : 프로젝트에 멤버 초대
+  - POST : 멤버 초대 수락
+  - DELETE : 멤버 초대 삭제
+
 - SubTask API
-  - (추후 작업 내용 작성)
+  - POST : 하위 할 일 생성
+  - GET : 하위 할 일 목록 조회
+  - GET : 하위 할 일 조회
+  - PATCH : 하위 할 일 수정
+  - DELETE : 하위 할 일 삭제
 
 ---
 
@@ -65,7 +102,6 @@
 ├── prisma
 │   └── schema.prisma
 ├── src
-│   ├── app.ts
 │   ├── server.ts
 │   ├── libs
 │   │   └── common.ts
@@ -86,7 +122,7 @@
 │       └── express
 │           └── common.ts
 └── uploads
-    └── common.ts
+    └── common.jpg
 
 ```
 
@@ -94,15 +130,15 @@
 
 ## **구현 홈페이지**
 
-(개발한 홈페이지에 대한 링크 게시)
-
-https://www.example.kr/
+[배포 링크](https://nb06-moonshot-team04-ai-trio.onrender.com/)
 
 ---
 
 ## **프로젝트 회고록**
 
-(제작한 발표자료 링크 혹은 첨부파일 첨부)
+- [개발 레포트 - 오윤](https://www.notion.so/2e761538a9e28064b291c49c4d711701?source=copy_link)
+- [개발 레포트 - 김민혁](https://www.notion.so/2e761538a9e280cbae73ea3c4870d87f?source=copy_link)
+- [개발 레포트 - 김지선](https://www.notion.so/2e761538a9e2803fbb89d936af4bd069?source=copy_link)
 
 ---
 
