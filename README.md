@@ -1,6 +1,7 @@
 # **{Team04-AI_trio}**
 
-[협업 문서 링크](https://github.com/minyeok123/nb06-Moonshot-team04-AI_trio)
+[협업 문서 링크 - github](https://github.com/minyeok123/nb06-Moonshot-team04-AI_trio)
+[협업 문서 링크 - notion](https://www.notion.so/Team-Project-2ce61538a9e2806ba419d21e4473dc06?source=copy_link)
 
 ## **팀원 구성**
 
@@ -47,6 +48,9 @@
 
 ### 오윤
 
+- Auth API
+  - 리프레시 토큰
+  - Google Oauth 연동
 - Member API
   - (추후 작업 내용 작성)
 - SubTask API
