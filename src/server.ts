@@ -20,6 +20,7 @@ import commentRouter from '@modules/comment/comment.router';
 import fileRouter from '@modules/file/file.router';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Swagger 설정
 const isProd = process.env.NODE_ENV === 'production';
@@ -62,8 +63,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
     },
   }),
 );
