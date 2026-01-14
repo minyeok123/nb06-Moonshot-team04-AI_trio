@@ -35,6 +35,7 @@ export class AuthController {
   };
 
   static googleCallback = async (req: Request, res: Response) => {
+    console.log('여기');
     const { code } = req.query;
     const { accessToken, refreshToken } = (await authService.googleLoginByGoogleInfo(
       String(code),
