@@ -28,6 +28,8 @@ export class AuthController {
   static googleLogin = async (req: Request, res: Response) => {
     const createState = generateState(16);
     req.session.oauthState = createState;
+    console.log(createState);
+    console.log(req.session.oauthState);
     const googleRedirectUrl = await authService.googleLogin(createState);
     res.status(302).redirect(googleRedirectUrl);
   };
