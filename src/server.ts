@@ -61,6 +61,7 @@ app.use(
     secret: SESSION_SECRET! || 'dev-secret',
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       httpOnly: true,
       secure: true,
