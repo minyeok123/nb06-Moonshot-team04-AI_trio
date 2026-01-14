@@ -36,6 +36,9 @@ export class AuthController {
 
   static googleCallback = async (req: Request, res: Response) => {
     console.log('여기');
+    console.log('cookies before set:', req.headers.cookie);
+    console.log('secure?', req.secure);
+    console.log('x-forwarded-proto:', req.headers['x-forwarded-proto']);
     const { code } = req.query;
     const { accessToken, refreshToken } = (await authService.googleLoginByGoogleInfo(
       String(code),
