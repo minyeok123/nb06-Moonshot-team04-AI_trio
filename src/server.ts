@@ -62,8 +62,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'lax' : 'none',
+      secure: true,
+      sameSite: 'none',
     },
   }),
 );
