@@ -43,14 +43,14 @@ export class AuthController {
 
     res.cookie('access-token', accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       maxAge: 60 * 60 * 1000,
     });
 
     res.cookie('refresh-token', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
